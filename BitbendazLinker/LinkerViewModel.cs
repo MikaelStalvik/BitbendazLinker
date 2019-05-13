@@ -59,10 +59,12 @@ namespace BitbendazLinker
         public RelayCommand LoadCommand { get; }
         public RelayCommand GenerateShadersCommand { get; }
         public RelayCommand BrowseShaderOutputFileCommand { get; }
+        public RelayCommand AddShadersCommand { get; }
         public RelayCommand RemoveShadersCommand { get; }
 
         public LinkerViewModel()
         {
+            Shaders = new ObservableCollection<string>();
             BrowseCommand = new RelayCommand(o =>
             {
                 var dlg = new OpenFileDialog();
@@ -103,6 +105,16 @@ namespace BitbendazLinker
                 SelectedShaders.Clear();
                 RemoveShadersCommand.InvokeCanExecuteChanged();
             }, o => SelectedShaders?.Count > 0);
+            AddShadersCommand = new RelayCommand(o =>
+            {
+                var dlg = new OpenFileDialog();
+                dlg.Multiselect = true;
+                if (dlg.ShowDialog() == true)
+                {
+                    foreach (var file in dlg.FileNames) Shaders.Add(file);                    
+                }
+            }, o => true);
+
         }
         private void LoadFromFile(object o)
         {
@@ -125,7 +137,7 @@ namespace BitbendazLinker
             foreach (var glslFile in _shaders)
             {
                 var sourceData = File.ReadAllLines(glslFile);
-                var name = Path.GetFileName(glslFile).Replace(".glsl", "_min");
+                var name = Path.GetFileName(glslFile).Replace(Path.GetExtension(glslFile), "_min");
                 sb.AppendLine($"const char *{name} =");
                 var nl = "\\n";
                 foreach (var s in sourceData)

@@ -35,7 +35,7 @@
                     </Grid.RowDefinitions>
                     <ListBox ItemsSource="{Binding Shaders, Mode=TwoWay}" Grid.Row="0" SelectionMode="Extended" SelectionChanged="ListBox_SelectionChanged"/>
                     <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,8,0,0">
-                        <Button Width="80" Content="Add"/>
+                        <Button Width="80" Content="Add..." Command="{Binding AddShadersCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveShadersCommand}"/>
                     </DockPanel>
                 </Grid>
