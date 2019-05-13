@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -10,20 +11,20 @@ namespace BitbendazLinker
 {
     public class LinkerViewModel : ViewModelBase
     {
-        private List<string> _shaders;
-        public List<string> Shaders
+        private ObservableCollection<string> _shaders;
+        public ObservableCollection<string> Shaders
         {
             get => _shaders;
             set => SetProperty(ref _shaders, value);
         }
-        private List<string> _objects;
-        public List<string> Objects
+        private ObservableCollection<string> _objects;
+        public ObservableCollection<string> Objects
         {
             get => _objects;
             set => SetProperty(ref _objects, value);
         }
-        private List<string> _textures;
-        public List<string> Textures
+        private ObservableCollection<string> _textures;
+        public ObservableCollection<string> Textures
         {
             get => _textures;
             set => SetProperty(ref _textures, value);
@@ -43,10 +44,22 @@ namespace BitbendazLinker
             set => SetProperty(ref _shaderOutputFile, value);
         }
 
+        private List<string> _selectedShaders;
+        public List<string> SelectedShaders
+        {
+            get => _selectedShaders;
+            set
+            {
+                SetProperty(ref _selectedShaders, value);
+                RemoveShadersCommand.InvokeCanExecuteChanged();
+            }
+        }
+
         public RelayCommand BrowseCommand { get; }
         public RelayCommand LoadCommand { get; }
         public RelayCommand GenerateShadersCommand { get; }
         public RelayCommand BrowseShaderOutputFileCommand { get; }
+        public RelayCommand RemoveShadersCommand { get; }
 
         public LinkerViewModel()
         {
@@ -59,6 +72,7 @@ namespace BitbendazLinker
                 {
                     IndexFile = dlg.FileName;
                     LoadCommand.InvokeCanExecuteChanged();
+                    LoadCommand.Execute(null);
                 }
             }, o => true);
             LoadCommand = new RelayCommand(LoadFromFile, o => File.Exists(_indexFile));
@@ -74,14 +88,29 @@ namespace BitbendazLinker
                     GenerateShadersCommand.InvokeCanExecuteChanged();
                 }
             }, o => true);
+            RemoveShadersCommand = new RelayCommand(o => 
+            {
+                var tmp = new List<string>();
+                foreach (var item in _shaders)
+                {
+                    if (!_selectedShaders.Contains(item))
+                    {
+                        tmp.Add(item);
+                    }
+                }
+                Shaders = new ObservableCollection<string>(tmp);
+                
+                SelectedShaders.Clear();
+                RemoveShadersCommand.InvokeCanExecuteChanged();
+            }, o => SelectedShaders?.Count > 0);
         }
         private void LoadFromFile(object o)
         {
             var json = File.ReadAllText(_indexFile);
             var contentData = JsonConvert.DeserializeObject<ContentData>(json);
-            Shaders = contentData.Shaders;
-            Objects = contentData.Objects;
-            Textures = contentData.Textures;
+            Shaders = new ObservableCollection<string>(contentData.Shaders);
+            Objects = new ObservableCollection<string>(contentData.Objects);
+            Textures = new ObservableCollection<string>(contentData.Textures);
         }
 
         private void GenerateShaders(object o)

@@ -28,6 +28,10 @@ namespace BitbendazLinker
             DataContext = _viewModel;
         }
 
-
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var listBox = (ListBox)sender;
+            _viewModel.SelectedShaders = listBox.SelectedItems.Cast<String>().ToList();
+        }
     }
 }
