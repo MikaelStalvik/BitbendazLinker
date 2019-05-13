@@ -157,5 +157,119 @@ namespace BitbendazLinker
             File.WriteAllText(_shaderOutputFile, sb.ToString());
             MessageBox.Show("Shader header file generated");
         }
+
+        private long GenerateFileBlock(StringBuilder sb, string filename, long ofs)
+        {
+            FileInfo fi = new FileInfo(filename);
+            sb.Append("{");
+            sb.Append(ofs);
+            sb.Append(",");
+            sb.Append(fi.Length);
+            sb.Append(", std::string(\"");
+            sb.Append(System.IO.Path.GetFileName(filename));
+            sb.Append("\")}");
+            return fi.Length;
+        }
+
+        private void Pack()
+        {
+            var json = File.ReadAllText(ShaderIndexTb.Text);
+            var cd = JsonConvert.DeserializeObject<ContentData>(json);
+
+            var sb = new StringBuilder();
+            sb.AppendLine("#include <string>");
+            sb.AppendLine("namespace {");
+            sb.AppendLine("struct FileObject");
+            sb.AppendLine("{");
+            sb.AppendLine("int offset;");
+            sb.AppendLine("int size;");
+            sb.AppendLine("std::string filename;");
+            sb.AppendLine("};");
+
+
+            long ofs = 0;
+            var idx = 0;
+            sb.AppendLine($"FileObject objectFileObjects[{cd.Objects.Count}] = {{");
+            foreach (var file in cd.Objects)
+            {
+                var l = GenerateFileBlock(sb, file, ofs);
+                ofs += l;
+                if (idx < cd.Objects.Count - 1)
+                {
+                    sb.AppendLine(",");
+                };
+                idx++;
+            }
+            sb.AppendLine("};");
+
+            idx = 0;
+            sb.AppendLine($"FileObject textureFileObjects[{cd.Textures.Count}] = {{");
+            foreach (var file in cd.Textures)
+            {
+                var l = GenerateFileBlock(sb, file, ofs);
+                ofs += l;
+                if (idx < cd.Textures.Count - 1)
+                {
+                    sb.AppendLine(",");
+                };
+                idx++;
+            }
+            sb.AppendLine("};");
+
+            sb.AppendLine("int offsetForObject(std::string resName)");
+            sb.AppendLine("{");
+            sb.AppendLine("size_t n = sizeof(objectFileObjects) / sizeof(objectFileObjects[0]);");
+            sb.AppendLine("for (int i = 0; i < n; i++)");
+            sb.AppendLine("{");
+            sb.AppendLine("if (objectFileObjects[i].filename == resName)");
+            sb.AppendLine("{");
+            sb.AppendLine("return objectFileObjects[i].offset;");
+            sb.AppendLine("}");
+            sb.AppendLine("}");
+            sb.AppendLine("return -1;");
+            sb.AppendLine("}");
+
+            sb.AppendLine("int offsetForTexture(std::string resName)");
+            sb.AppendLine("{");
+            sb.AppendLine("size_t n = sizeof(textureFileObjects) / sizeof(textureFileObjects[0]);");
+            sb.AppendLine("for (int i = 0; i < n; i++)");
+            sb.AppendLine("{");
+            sb.AppendLine("if (textureFileObjects[i].filename == resName)");
+            sb.AppendLine("{");
+            sb.AppendLine("return textureFileObjects[i].offset;");
+            sb.AppendLine("}");
+            sb.AppendLine("}");
+            sb.AppendLine("return -1;");
+            sb.AppendLine("}");
+
+            sb.AppendLine("}");
+
+            // generate header file
+            File.WriteAllText(@"c:\temp\data_header.h", sb.ToString());
+
+            // generate data file
+            var df = @"c:\temp\data.bb";
+            using (var destFile = new FileStream(df, FileMode.Create))
+            {
+                foreach (var file in cd.Objects)
+                {
+                    using (var src = new FileStream(file, FileMode.Open))
+                    {
+                        var buf = new byte[src.Length];
+                        src.Read(buf, 0, buf.Length);
+                        destFile.Write(buf, 0, buf.Length);
+                    }
+                }
+                foreach (var file in cd.Textures)
+                {
+                    using (var src = new FileStream(file, FileMode.Open))
+                    {
+                        var buf = new byte[src.Length];
+                        src.Read(buf, 0, buf.Length);
+                        destFile.Write(buf, 0, buf.Length);
+                    }
+                }
+            }
+        }
     }
 }
