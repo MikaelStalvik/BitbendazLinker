@@ -76,7 +76,7 @@
         <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,8,0,0">
             <Button Width="112" Content="Generate Shaders" Command="{Binding GenerateShadersCommand}"/>
             <Button Width="112" Content="Generate Data" Margin="8,0,0,0" Command="{Binding GenerateDataFileCommand}"/>
-            <Button Width="80" Content="Cancel" DockPanel.Dock="Right" Margin="8,0,0,0"/>
+            <Button Width="80" Content="Close" DockPanel.Dock="Right" Margin="8,0,0,0" Command="{Binding CloseCommand}"/>
             <Button Width="80" Content="Save" DockPanel.Dock="Right"/>
         </DockPanel>
 

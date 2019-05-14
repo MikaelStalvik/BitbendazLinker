@@ -104,10 +104,13 @@ namespace BitbendazLinker
         public RelayCommand RemoveTexturesCommand { get; }
         public RelayCommand AddObjectsCommand { get; }
         public RelayCommand RemoveObjectsCommand { get; }
+        public RelayCommand CloseCommand { get; }
 
         public LinkerViewModel()
         {
+            Objects = new ObservableCollection<string>();
             Shaders = new ObservableCollection<string>();
+            Textures = new ObservableCollection<string>();
             BrowseCommand = new RelayCommand(o =>
             {
                 var dlg = new OpenFileDialog();
@@ -153,6 +156,7 @@ namespace BitbendazLinker
                 if (dlg.ShowDialog() == true)
                 {
                     foreach (var file in dlg.FileNames) Shaders.Add(file);
+                    RemoveShadersCommand.InvokeCanExecuteChanged();
                 }
             }, o => true);
             RemoveShadersCommand = new RelayCommand(o =>
@@ -179,6 +183,7 @@ namespace BitbendazLinker
                 if (dlg.ShowDialog() == true)
                 {
                     foreach (var file in dlg.FileNames) Textures.Add(file);
+                    RemoveTexturesCommand.InvokeCanExecuteChanged();
                 }
             }, o => true);
             RemoveTexturesCommand = new RelayCommand(o =>
@@ -205,6 +210,7 @@ namespace BitbendazLinker
                 if (dlg.ShowDialog() == true)
                 {
                     foreach (var file in dlg.FileNames) Objects.Add(file);
+                    RemoveObjectsCommand.InvokeCanExecuteChanged();
                 }
             }, o => true);
             RemoveTexturesCommand = new RelayCommand(o =>
@@ -223,7 +229,10 @@ namespace BitbendazLinker
                 SelectedObjects.Clear();
                 RemoveObjectsCommand.InvokeCanExecuteChanged();
             }, o => SelectedObjects?.Count > 0);
-
+            CloseCommand = new RelayCommand(o =>
+            {
+                Application.Current.MainWindow.Close();
+            }, o => true);
         }
         private void LoadFromFile(object o)
         {
