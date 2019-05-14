@@ -8,6 +8,24 @@ The tool will also link multiple binary files into one large file and also gener
 
 Bitbendaz Linker Tool comes with a GUI application (Windows only) and a CLI version which works on Windows, Linux and MacOs (requires .NET Core installed)
 
+## Using generated files
+
+In your C/C++ project include the generated .h files.
+
+To get the contents from a shader by name, simply get the string (const char*) by it's name. The generated name will be set to the shader file plus the \_min suffix. Example:
+
+  source filename is "abstract_worlds.glsl", the generated constant will be named "abstract_worlds_min"
+
+To load an object or texture, use the generated dictionary header file to perform offset lookups. Example:
+	
+  int ofs = offsetForTexture(resname); // get the file offset for a resource. resname is of type std::string.
+  offsetForTexture is a generated helper function.
+  
+If a resource is not found, ofs will be set to -1. If found, it will return the offset to where in the linked file the resource data starts (in bytes).
+
+Each entry in the generated dictionary contains: offset in bytes, size in bytes and resource name as std::string.
+
+
 ## Requirements
 .NET Framework 4.7.2 (WPF client) and .NET Core (2.1).
 
