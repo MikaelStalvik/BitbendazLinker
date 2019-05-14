@@ -1,5 +1,4 @@
-﻿using BitbendazLinker.Models;
-using BitbendazLinkerLogic;
+﻿using BitbendazLinkerLogic;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using System.Collections.Generic;

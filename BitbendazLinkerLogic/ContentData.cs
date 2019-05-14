@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BitbendazLinker.Models
+namespace BitbendazLinkerLogic
 {
     public class ContentData
     {

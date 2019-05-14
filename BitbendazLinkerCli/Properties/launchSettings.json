@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BitbendazLinkerCli": {
+      "commandName": "Project",
+      "commandLineArgs": "--proj=\"C:\\dev\\bbdemokit\\src\\shaderindex2.json\" --so=\"c:\\temp\\shaders_min.h\" --lo=\"c:\\temp\\linked.bb\" --removecomments"
+    }
+  }
+}
