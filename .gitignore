@@ -2,3 +2,7 @@
 BitbendazLinker/obj/
 packages/
 BitbendazLinker/bin/
+BitbendazLinkerCli/obj/
+BitbendazLinkerCli/bin/
+BitbendazLinkerLogic/obj/
+BitbendazLinkerLogic/bin/

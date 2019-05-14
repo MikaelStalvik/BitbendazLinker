@@ -102,6 +102,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\BitbendazLinkerLogic\BitbendazLinkerLogic.csproj">
+      <Project>{cf836002-8991-403e-856b-270840b73422}</Project>
+      <Name>BitbendazLinkerLogic</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
