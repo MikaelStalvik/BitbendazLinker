@@ -141,9 +141,12 @@ namespace BitbendazLinkerLogic
 
         public static (bool, string) GenerateLinkedFile(IEnumerable<string> objects, IEnumerable<string> textures, string outputFilename)
         {
-            if (string.IsNullOrWhiteSpace(outputFilename)) return (false, "Output filename not defined");
-            if (File.Exists(outputFilename)) return (false, "Output file exists");
-            if (File.Exists(HeaderFilename(outputFilename))) return (false, $"{HeaderFilename(outputFilename)} exists");
+            if (string.IsNullOrWhiteSpace(outputFilename))
+                return (false, "Output filename not defined");
+            if (File.Exists(outputFilename))
+                return (false, "Output file exists");
+            if (File.Exists(HeaderFilename(outputFilename)))
+                return (false, $"{HeaderFilename(outputFilename)} exists");
             var sb = new StringBuilder();
             AddHeader(sb);
             long ofs = 0;

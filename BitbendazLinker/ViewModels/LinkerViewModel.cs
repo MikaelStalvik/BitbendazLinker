@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 
-namespace BitbendazLinker
+namespace BitbendazLinker.ViewModels
 {
     public enum ListType
     {
@@ -109,6 +109,7 @@ namespace BitbendazLinker
         public RelayCommand AddObjectsCommand { get; }
         public RelayCommand RemoveObjectsCommand { get; }
         public RelayCommand CloseCommand { get; }
+        public RelayCommand SaveProjectCommand { get; }
 
         public LinkerViewModel()
         {
@@ -128,7 +129,7 @@ namespace BitbendazLinker
                 }
             }, o => true);
             LoadCommand = new RelayCommand(LoadFromFile, o => File.Exists(_indexFile));
-            GenerateShadersCommand = new RelayCommand(GenerateShaders, o => !string.IsNullOrWhiteSpace(_shaderOutputFile) );
+            GenerateShadersCommand = new RelayCommand(GenerateShaders, o => !string.IsNullOrWhiteSpace(_shaderOutputFile));
             BrowseShaderOutputFileCommand = new RelayCommand(o =>
             {
                 var dlg = new SaveFileDialog();
@@ -185,6 +186,27 @@ namespace BitbendazLinker
             {
                 Application.Current.MainWindow.Close();
             }, o => true);
+
+            SaveProjectCommand = new RelayCommand(o =>
+            {
+                var dlg = new SaveFileDialog();
+                dlg.Filter = "Project files (json)|*.json";
+                dlg.DefaultExt = ".json";
+                if (dlg.ShowDialog() == true)
+                {
+                    var contentData = new ContentData
+                    {
+                        Objects = Objects.ToList(),
+                        Shaders = Shaders.ToList(),
+                        Textures = Textures.ToList(),
+                        LinkedOutputFile = _linkedOutputFile,
+                        RemoveComments = _removeComments,
+                        ShaderOutputFile = _shaderOutputFile
+                    };
+                    var json = JsonConvert.SerializeObject(contentData);
+                    File.WriteAllText(dlg.FileName, json);
+                }
+            }, o => true);
         }
 
         private void RemoveSelectedItemsFromList(ObservableCollection<string> targetList, IList<string> removeList, RelayCommand command, ListType listType)
@@ -197,7 +219,7 @@ namespace BitbendazLinker
                     tmp.Add(item);
                 }
             }
-            switch(listType)
+            switch (listType)
             {
                 case ListType.Shader: Shaders = new ObservableCollection<string>(tmp); break;
                 case ListType.Object: Objects = new ObservableCollection<string>(tmp); break;
@@ -223,6 +245,9 @@ namespace BitbendazLinker
             Shaders = new ObservableCollection<string>(contentData.Shaders);
             Objects = new ObservableCollection<string>(contentData.Objects);
             Textures = new ObservableCollection<string>(contentData.Textures);
+            ShaderOutputFile = contentData.ShaderOutputFile;
+            LinkedOutputFile = contentData.LinkedOutputFile;
+            RemoveComments = contentData.RemoveComments;
         }
 
         private void GenerateShaders(object o)

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace BitbendazLinker.Models
 {
@@ -11,5 +7,8 @@ namespace BitbendazLinker.Models
         public List<string> Shaders { get; set; }
         public List<string> Objects { get; set; }
         public List<string> Textures { get; set; }
+        public string ShaderOutputFile { get; set; }
+        public string LinkedOutputFile { get; set; }
+        public bool RemoveComments { get; set; }
     }
 }

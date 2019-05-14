@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace BitbendazLinker
+namespace BitbendazLinker.ViewModels
 {
     public abstract class ViewModelBase : INotifyPropertyChanged
     {
