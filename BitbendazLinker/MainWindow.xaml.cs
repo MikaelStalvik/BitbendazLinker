@@ -31,7 +31,19 @@ namespace BitbendazLinker
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var listBox = (ListBox)sender;
-            _viewModel.SelectedShaders = listBox.SelectedItems.Cast<String>().ToList();
+            _viewModel.SelectedShaders = listBox.SelectedItems.Cast<string>().ToList();
+        }
+
+        private void ListBoxTextures_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var listBox = (ListBox)sender;
+            _viewModel.SelectedTextures = listBox.SelectedItems.Cast<string>().ToList();
+        }
+
+        private void ListBoxObjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var listBox = (ListBox)sender;
+            _viewModel.SelectedObjects = listBox.SelectedItems.Cast<string>().ToList();
         }
     }
 }

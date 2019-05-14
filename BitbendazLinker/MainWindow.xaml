@@ -21,14 +21,20 @@
             <TabItem Header="Settings">
                 <StackPanel Margin="8">
                     <DockPanel>
-                        <TextBlock Text="Shader output filename" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Shader output filename" Margin="0,0,4,0" VerticalAlignment="Center" Width="128"/>
                         <Button Command="{Binding BrowseShaderOutputFileCommand}" Content="Browse..." Width="80" DockPanel.Dock="Right"/>
                         <TextBox Text="{Binding ShaderOutputFile}"/>
+                    </DockPanel>
+                    <CheckBox IsChecked="{Binding RemoveComments}" Content="Remove comments" Margin="132,4,0,0"/>
+                    <DockPanel Margin="0,8,0,0">
+                        <TextBlock Text="Linked output filename" Margin="0,0,4,0" VerticalAlignment="Center" Width="128"/>
+                        <Button Command="{Binding BrowseLinkedOutputFileCommand}" Content="Browse..." Width="80" DockPanel.Dock="Right"/>
+                        <TextBox Text="{Binding LinkedOutputFile}"/>
                     </DockPanel>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Shaders">
-                <Grid>
+                <Grid Margin="8">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="32"/>
@@ -41,15 +47,35 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Objects">
-                <ListBox ItemsSource="{Binding Objects}"/>
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"/>
+                    </Grid.RowDefinitions>
+                    <ListBox ItemsSource="{Binding Objects, Mode=TwoWay}" Grid.Row="0" SelectionMode="Extended" SelectionChanged="ListBoxObjects_SelectionChanged"/>
+                    <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,8,0,0">
+                        <Button Width="80" Content="Add..." Command="{Binding AddObjectsCommand}"/>
+                        <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveObjectsCommand}"/>
+                    </DockPanel>
+                </Grid>
             </TabItem>
             <TabItem Header="Textures">
-                <ListBox ItemsSource="{Binding Textures}"/>
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"/>
+                    </Grid.RowDefinitions>
+                    <ListBox ItemsSource="{Binding Textures, Mode=TwoWay}" Grid.Row="0" SelectionMode="Extended" SelectionChanged="ListBoxTextures_SelectionChanged"/>
+                    <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,8,0,0">
+                        <Button Width="80" Content="Add..." Command="{Binding AddTexturesCommand}"/>
+                        <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveTexturesCommand}"/>
+                    </DockPanel>
+                </Grid>
             </TabItem>
         </TabControl>
         <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,8,0,0">
             <Button Width="112" Content="Generate Shaders" Command="{Binding GenerateShadersCommand}"/>
-            <Button Width="112" Content="Generate Data" Margin="8,0,0,0"/>
+            <Button Width="112" Content="Generate Data" Margin="8,0,0,0" Command="{Binding GenerateDataFileCommand}"/>
             <Button Width="80" Content="Cancel" DockPanel.Dock="Right" Margin="8,0,0,0"/>
             <Button Width="80" Content="Save" DockPanel.Dock="Right"/>
         </DockPanel>
