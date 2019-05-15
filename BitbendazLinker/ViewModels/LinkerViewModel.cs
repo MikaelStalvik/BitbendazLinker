@@ -1,9 +1,12 @@
-﻿using BitbendazLinkerLogic;
+﻿using BitbendazLinker.Models;
+using BitbendazLinkerLogic;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
 
 namespace BitbendazLinker.ViewModels
@@ -14,25 +17,92 @@ namespace BitbendazLinker.ViewModels
         Object,
         Texture
     }
+
     public class LinkerViewModel : ViewModelBase
     {
-        private ObservableCollection<string> _shaders;
-        public ObservableCollection<string> Shaders
+        private const string HEADER_FILTER = "Header files|*.h";
+        private const string JSON_FILTER = "JSON files|*.json";
+        private const string BBDATA_FILTER = "Bitbendaz data files|*.bb";
+
+        private int _shaderCount;
+        public int ShaderCount
+        {
+            get => _shaderCount;
+            set => SetProperty(ref _shaderCount, value);
+        }
+        private ObservableCollection<FileHolder> _shaders;
+        public ObservableCollection<FileHolder> Shaders
         {
             get => _shaders;
-            set => SetProperty(ref _shaders, value);
+            set
+            {
+                SetProperty(ref _shaders, value);
+                ShaderCount = Shaders.Count;
+            }
         }
-        private ObservableCollection<string> _objects;
-        public ObservableCollection<string> Objects
+        private List<FileHolder> _selectedShaders;
+        public List<FileHolder> SelectedShaders
+        {
+            get => _selectedShaders;
+            set
+            {
+                SetProperty(ref _selectedShaders, value);
+                RemoveShadersCommand.InvokeCanExecuteChanged();
+            }
+        }
+
+        private ObservableCollection<FileHolder> _objects;
+        public ObservableCollection<FileHolder> Objects
         {
             get => _objects;
-            set => SetProperty(ref _objects, value);
+            set
+            {
+                SetProperty(ref _objects, value);
+                ObjectCount = Objects.Count;
+            }
         }
-        private ObservableCollection<string> _textures;
-        public ObservableCollection<string> Textures
+        private int _objectCount;
+        public int ObjectCount
+        {
+            get => _objectCount;
+            set => SetProperty(ref _objectCount, value);
+        }
+        private List<FileHolder> _selectedObjects;
+        public List<FileHolder> SelectedObjects
+        {
+            get => _selectedObjects;
+            set
+            {
+                SetProperty(ref _selectedObjects, value);
+                RemoveObjectsCommand.InvokeCanExecuteChanged();
+            }
+        }
+
+        private ObservableCollection<FileHolder> _textures;
+        public ObservableCollection<FileHolder> Textures
         {
             get => _textures;
-            set => SetProperty(ref _textures, value);
+            set
+            {
+                SetProperty(ref _textures, value);
+                TextureCount = Textures.Count;
+            }
+        }
+        private int _textureCount;
+        public int TextureCount
+        {
+            get => _textureCount;
+            set => SetProperty(ref _textureCount, value);
+        }
+        private List<FileHolder> _selectedTextures;
+        public List<FileHolder> SelectedTextures
+        {
+            get => _selectedTextures;
+            set
+            {
+                SetProperty(ref _selectedTextures, value);
+                RemoveTexturesCommand.InvokeCanExecuteChanged();
+            }
         }
 
         private string _indexFile;
@@ -49,16 +119,6 @@ namespace BitbendazLinker.ViewModels
             set => SetProperty(ref _shaderOutputFile, value);
         }
 
-        private List<string> _selectedShaders;
-        public List<string> SelectedShaders
-        {
-            get => _selectedShaders;
-            set
-            {
-                SetProperty(ref _selectedShaders, value);
-                RemoveShadersCommand.InvokeCanExecuteChanged();
-            }
-        }
 
         private string _linkedOutputHeaderFile;
         public string LinkedOutputHeaderFile
@@ -78,28 +138,6 @@ namespace BitbendazLinker.ViewModels
         {
             get => _removeComments;
             set => SetProperty(ref _removeComments, value);
-        }
-
-        private List<string> _selectedTextures;
-        public List<string> SelectedTextures
-        {
-            get => _selectedTextures;
-            set
-            {
-                SetProperty(ref _selectedTextures, value);
-                RemoveTexturesCommand.InvokeCanExecuteChanged();
-            }
-        }
-
-        private List<string> _selectedObjects;
-        public List<string> SelectedObjects
-        {
-            get => _selectedObjects;
-            set
-            {
-                SetProperty(ref _selectedObjects, value);
-                RemoveObjectsCommand.InvokeCanExecuteChanged();
-            }
         }
 
         private bool _generateShaders;
@@ -132,57 +170,56 @@ namespace BitbendazLinker.ViewModels
         public RelayCommand SaveProjectCommand { get; }
         public RelayCommand GenerateFilesCommand { get; }
 
+        private void OpenFileDialog(string defaultExt, string filter, Action<string> completeAction)
+        {
+            var dlg = new OpenFileDialog();
+            dlg.DefaultExt = defaultExt;
+            dlg.Filter = filter;
+            if (dlg.ShowDialog() == true) completeAction(dlg.FileName);
+        }
+        private void SaveFileDialog(string defaultExt, string filter, Action<string> completeAction)
+        {
+            var dlg = new SaveFileDialog();
+            dlg.DefaultExt = defaultExt;
+            dlg.Filter = filter;
+            if (dlg.ShowDialog() == true) completeAction(dlg.FileName);
+        }
         public LinkerViewModel()
         {
-            Objects = new ObservableCollection<string>();
-            Shaders = new ObservableCollection<string>();
-            Textures = new ObservableCollection<string>();
+            Objects = new ObservableCollection<FileHolder>();
+            Shaders = new ObservableCollection<FileHolder>();
+            Textures = new ObservableCollection<FileHolder>();
             BrowseCommand = new RelayCommand(o =>
             {
-                var dlg = new OpenFileDialog();
-                dlg.DefaultExt = ".json";
-                dlg.Filter = "JSON files|*.json";
-                if (dlg.ShowDialog() == true)
-                {
-                    IndexFile = dlg.FileName;
+                OpenFileDialog(".json", JSON_FILTER, filename => {
+                    IndexFile = filename;
                     LoadCommand.InvokeCanExecuteChanged();
                     LoadCommand.Execute(null);
-                }
+                });
             }, o => true);
             LoadCommand = new RelayCommand(LoadFromFile, o => File.Exists(_indexFile));
             GenerateShadersCommand = new RelayCommand(InvokeGenerateShaders, o => !string.IsNullOrWhiteSpace(_shaderOutputFile));
             BrowseShaderOutputFileCommand = new RelayCommand(o =>
             {
-                var dlg = new SaveFileDialog();
-                dlg.DefaultExt = ".h";
-                dlg.Filter = "Header files|*.h";
-                if (dlg.ShowDialog() == true)
-                {
-                    ShaderOutputFile = dlg.FileName;
+                SaveFileDialog(".h", HEADER_FILTER, filename => {
+                    ShaderOutputFile = filename;
                     GenerateShadersCommand.InvokeCanExecuteChanged();
-                }
+                });
             }, o => true);
             BrowseLinkedOutputFileCommand = new RelayCommand(o =>
             {
-                var dlg = new SaveFileDialog();
-                dlg.DefaultExt = ".bb";
-                dlg.Filter = "Bitbendaz data files|*.bb";
-                if (dlg.ShowDialog() == true)
+                SaveFileDialog(".bb", BBDATA_FILTER, filename =>
                 {
-                    LinkedOutputFile = dlg.FileName;
+                    LinkedOutputFile = filename;
                     GenerateLinkedFileCommand.InvokeCanExecuteChanged();
-                }
+                });
             }, o => true);
             BrowseLinkedOutputHeaderFileCommand = new RelayCommand(o =>
             {
-                var dlg = new SaveFileDialog();
-                dlg.DefaultExt = ".h";
-                dlg.Filter = "Header files|*.h";
-                if (dlg.ShowDialog() == true)
-                {
-                    LinkedOutputHeaderFile = dlg.FileName;
+                SaveFileDialog(".h", HEADER_FILTER, filename => {
+                    LinkedOutputHeaderFile = filename;
                     GenerateLinkedFileCommand.InvokeCanExecuteChanged();
-                }
+                });
             }, o => true);
             GenerateLinkedFileCommand = new RelayCommand(GenerateDataFile, o => !string.IsNullOrWhiteSpace(_linkedOutputFile) && !string.IsNullOrWhiteSpace(_linkedOutputHeaderFile));
 
@@ -221,11 +258,7 @@ namespace BitbendazLinker.ViewModels
 
             SaveProjectCommand = new RelayCommand(o =>
             {
-                var dlg = new SaveFileDialog();
-                dlg.Filter = "Project files (json)|*.json";
-                dlg.DefaultExt = ".json";
-                if (dlg.ShowDialog() == true)
-                {
+                SaveFileDialog(".json", JSON_FILTER, filename => {
                     var contentData = new ContentData
                     {
                         Objects = Objects.ToList(),
@@ -239,8 +272,8 @@ namespace BitbendazLinker.ViewModels
                         GenerateLinkedFiles = _generateLinkedFiles
                     };
                     var json = JsonConvert.SerializeObject(contentData);
-                    File.WriteAllText(dlg.FileName, json);
-                }
+                    File.WriteAllText(filename, json);
+                });
             }, o => true);
             GenerateFilesCommand = new RelayCommand(o =>
             {
@@ -249,32 +282,32 @@ namespace BitbendazLinker.ViewModels
             }, o => GenerateShadersCommand.CanExecute(null) || GenerateLinkedFileCommand.CanExecute(null));
         }
 
-        private void RemoveSelectedItemsFromList(ObservableCollection<string> targetList, IList<string> removeList, RelayCommand command, ListType listType)
+        private void RemoveSelectedItemsFromList(ObservableCollection<FileHolder> targetList, List<FileHolder> removeList, RelayCommand command, ListType listType)
         {
-            var tmp = new List<string>();
+            var tmp = new List<FileHolder>();
             foreach (var item in targetList)
             {
-                if (!removeList.Contains(item))
+                if (removeList.FirstOrDefault(x => x.Filename.Equals(item.Filename)) == null)
                 {
                     tmp.Add(item);
                 }
             }
             switch (listType)
             {
-                case ListType.Shader: Shaders = new ObservableCollection<string>(tmp); break;
-                case ListType.Object: Objects = new ObservableCollection<string>(tmp); break;
-                case ListType.Texture: Textures = new ObservableCollection<string>(tmp); break;
+                case ListType.Shader: Shaders = new ObservableCollection<FileHolder>(tmp); break;
+                case ListType.Object: Objects = new ObservableCollection<FileHolder>(tmp); break;
+                case ListType.Texture: Textures = new ObservableCollection<FileHolder>(tmp); break;
             }
             removeList.Clear();
             command.InvokeCanExecuteChanged();
         }
 
-        private void SelectFilesAndAddToList(ObservableCollection<string> targetList, RelayCommand command)
+        private void SelectFilesAndAddToList(ObservableCollection<FileHolder> targetList, RelayCommand command)
         {
             var dlg = new OpenFileDialog { Multiselect = true };
             if (dlg.ShowDialog() == true)
             {
-                foreach (var file in dlg.FileNames) targetList.Add(file);
+                foreach (var file in dlg.FileNames) targetList.Add(new FileHolder { Filename = file, Size = Extensions.GetFileSize(file) });
                 command.InvokeCanExecuteChanged();
             }
         }
@@ -282,9 +315,9 @@ namespace BitbendazLinker.ViewModels
         {
             var json = File.ReadAllText(_indexFile);
             var contentData = JsonConvert.DeserializeObject<ContentData>(json);
-            Shaders = new ObservableCollection<string>(contentData.Shaders);
-            Objects = new ObservableCollection<string>(contentData.Objects);
-            Textures = new ObservableCollection<string>(contentData.Textures);
+            Shaders = contentData.Shaders.ToFileHolder();
+            Objects = contentData.Objects.ToFileHolder();
+            Textures = contentData.Textures.ToFileHolder();
             ShaderOutputFile = contentData.ShaderOutputFile;
             LinkedOutputFile = contentData.LinkedOutputFile;
             RemoveComments = contentData.RemoveComments;
@@ -298,13 +331,13 @@ namespace BitbendazLinker.ViewModels
 
         private void InvokeGenerateShaders(object o)
         {
-            var (result, message) = LinkerLogic.GenerateShaders(_shaders, _shaderOutputFile, _removeComments);
+            var (result, message) = LinkerLogic.GenerateShaders(Shaders.ToList(), _shaderOutputFile, _removeComments);
             MessageBox.Show(result ? message : $"Error: {message}");
         }
 
         private void GenerateDataFile(object o)
         {
-            var (result, message) = LinkerLogic.GenerateLinkedFile(Objects, Textures, _linkedOutputFile, _linkedOutputHeaderFile);
+            var (result, message) = LinkerLogic.GenerateLinkedFile(Objects.ToList(), Textures.ToList(), _linkedOutputFile, _linkedOutputHeaderFile);
             MessageBox.Show(result ? message : $"Error: {message}");
         }
     }
