@@ -9,6 +9,9 @@ namespace BitbendazLinkerLogic
         public List<string> Textures { get; set; }
         public string ShaderOutputFile { get; set; }
         public string LinkedOutputFile { get; set; }
+        public string LinkedOutputHeaderFile { get; set; }
         public bool RemoveComments { get; set; }
+        public bool GenerateShaders { get; set; }
+        public bool GenerateLinkedFiles { get; set; }
     }
 }

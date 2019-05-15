@@ -27,10 +27,18 @@
                     </DockPanel>
                     <CheckBox IsChecked="{Binding RemoveComments}" Content="Remove comments" Margin="132,4,0,0"/>
                     <DockPanel Margin="0,8,0,0">
+                        <TextBlock Text="Linked output header" Margin="0,0,4,0" VerticalAlignment="Center" Width="128"/>
+                        <Button Command="{Binding BrowseLinkedOutputHeaderFileCommand}" Content="Browse..." Width="80" DockPanel.Dock="Right"/>
+                        <TextBox Text="{Binding LinkedOutputHeaderFile}"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,8,0,0">
                         <TextBlock Text="Linked output filename" Margin="0,0,4,0" VerticalAlignment="Center" Width="128"/>
                         <Button Command="{Binding BrowseLinkedOutputFileCommand}" Content="Browse..." Width="80" DockPanel.Dock="Right"/>
                         <TextBox Text="{Binding LinkedOutputFile}"/>
                     </DockPanel>
+                    <CheckBox IsChecked="{Binding GenerateShaders}" Margin="132,8,0,0" Content="Generate shaders"/>
+                    <CheckBox IsChecked="{Binding GenerateLinkedFiles}" Margin="132,4,0,0" Content="Generate linked files"/>
+
                 </StackPanel>
             </TabItem>
             <TabItem Header="Shaders">
@@ -74,8 +82,7 @@
             </TabItem>
         </TabControl>
         <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,8,0,0">
-            <Button Width="112" Content="Generate Shaders" Command="{Binding GenerateShadersCommand}"/>
-            <Button Width="112" Content="Generate Data" Margin="8,0,0,0" Command="{Binding GenerateDataFileCommand}"/>
+            <Button Width="112" Content="Generate" Command="{Binding GenerateFilesCommand}"/>
             <Button Width="80" Content="Close" DockPanel.Dock="Right" Margin="8,0,0,0" Command="{Binding CloseCommand}"/>
             <Button Width="80" Content="Save" DockPanel.Dock="Right" Command="{Binding SaveProjectCommand}"/>
         </DockPanel>

@@ -108,10 +108,9 @@ namespace BitbendazLinkerLogic
             sb.AppendLine("}");
         }
 
-        private static string HeaderFilename(string filename) => Path.ChangeExtension(filename, ".h"); 
         private static void SaveHeaderFile(StringBuilder sb, string outputFilename)
         {
-            File.WriteAllText(HeaderFilename(outputFilename), sb.ToString());
+            File.WriteAllText(outputFilename, sb.ToString());
         }
 
         private static void CreateLinkedFile(string outputFilename, IEnumerable<string> objects, IEnumerable<string> textures)
@@ -139,14 +138,12 @@ namespace BitbendazLinkerLogic
             }
         }
 
-        public static (bool, string) GenerateLinkedFile(IEnumerable<string> objects, IEnumerable<string> textures, string outputFilename)
+        public static (bool, string) GenerateLinkedFile(IEnumerable<string> objects, IEnumerable<string> textures, string outputFilename, string outputHeaderFilename)
         {
             if (string.IsNullOrWhiteSpace(outputFilename))
                 return (false, "Output filename not defined");
-            if (File.Exists(outputFilename))
-                return (false, "Output file exists");
-            if (File.Exists(HeaderFilename(outputFilename)))
-                return (false, $"{HeaderFilename(outputFilename)} exists");
+            if (string.IsNullOrWhiteSpace(outputHeaderFilename))
+                return (false, "Output header filename not defined");
             var sb = new StringBuilder();
             AddHeader(sb);
             long ofs = 0;
@@ -179,7 +176,7 @@ namespace BitbendazLinkerLogic
             sb.AppendLine("};");
 
             GenerateBoilerplate(sb);
-            SaveHeaderFile(sb, outputFilename);
+            SaveHeaderFile(sb, outputHeaderFilename);
             CreateLinkedFile(outputFilename, objects, textures);
             return (true, "Linked file created OK!");
         }

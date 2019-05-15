@@ -60,6 +60,13 @@ namespace BitbendazLinker.ViewModels
             }
         }
 
+        private string _linkedOutputHeaderFile;
+        public string LinkedOutputHeaderFile
+        {
+            get => _linkedOutputHeaderFile;
+            set => SetProperty(ref _linkedOutputHeaderFile, value);
+        }
+
         private string _linkedOutputFile;
         public string LinkedOutputFile
         {
@@ -95,6 +102,19 @@ namespace BitbendazLinker.ViewModels
             }
         }
 
+        private bool _generateShaders;
+        public bool GenerateShaders
+        {
+            get => _generateShaders;
+            set => SetProperty(ref _generateShaders, value);
+        }
+        private bool _generateLinkedFiles;
+        public bool GenerateLinkedFiles
+        {
+            get => _generateLinkedFiles;
+            set => SetProperty(ref _generateLinkedFiles, value);
+        }
+
         public RelayCommand BrowseCommand { get; }
         public RelayCommand LoadCommand { get; }
         public RelayCommand GenerateShadersCommand { get; }
@@ -102,13 +122,15 @@ namespace BitbendazLinker.ViewModels
         public RelayCommand AddShadersCommand { get; }
         public RelayCommand RemoveShadersCommand { get; }
         public RelayCommand BrowseLinkedOutputFileCommand { get; }
-        public RelayCommand GenerateDataFileCommand { get; }
+        public RelayCommand BrowseLinkedOutputHeaderFileCommand { get; }
+        public RelayCommand GenerateLinkedFileCommand { get; }
         public RelayCommand AddTexturesCommand { get; }
         public RelayCommand RemoveTexturesCommand { get; }
         public RelayCommand AddObjectsCommand { get; }
         public RelayCommand RemoveObjectsCommand { get; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand SaveProjectCommand { get; }
+        public RelayCommand GenerateFilesCommand { get; }
 
         public LinkerViewModel()
         {
@@ -128,7 +150,7 @@ namespace BitbendazLinker.ViewModels
                 }
             }, o => true);
             LoadCommand = new RelayCommand(LoadFromFile, o => File.Exists(_indexFile));
-            GenerateShadersCommand = new RelayCommand(GenerateShaders, o => !string.IsNullOrWhiteSpace(_shaderOutputFile));
+            GenerateShadersCommand = new RelayCommand(InvokeGenerateShaders, o => !string.IsNullOrWhiteSpace(_shaderOutputFile));
             BrowseShaderOutputFileCommand = new RelayCommand(o =>
             {
                 var dlg = new SaveFileDialog();
@@ -148,10 +170,21 @@ namespace BitbendazLinker.ViewModels
                 if (dlg.ShowDialog() == true)
                 {
                     LinkedOutputFile = dlg.FileName;
-                    GenerateDataFileCommand.InvokeCanExecuteChanged();
+                    GenerateLinkedFileCommand.InvokeCanExecuteChanged();
                 }
             }, o => true);
-            GenerateDataFileCommand = new RelayCommand(GenerateDataFile, o => !string.IsNullOrWhiteSpace(_linkedOutputFile));
+            BrowseLinkedOutputHeaderFileCommand = new RelayCommand(o =>
+            {
+                var dlg = new SaveFileDialog();
+                dlg.DefaultExt = ".h";
+                dlg.Filter = "Header files|*.h";
+                if (dlg.ShowDialog() == true)
+                {
+                    LinkedOutputHeaderFile = dlg.FileName;
+                    GenerateLinkedFileCommand.InvokeCanExecuteChanged();
+                }
+            }, o => true);
+            GenerateLinkedFileCommand = new RelayCommand(GenerateDataFile, o => !string.IsNullOrWhiteSpace(_linkedOutputFile) && !string.IsNullOrWhiteSpace(_linkedOutputHeaderFile));
 
             AddShadersCommand = new RelayCommand(o =>
             {
@@ -200,12 +233,20 @@ namespace BitbendazLinker.ViewModels
                         Textures = Textures.ToList(),
                         LinkedOutputFile = _linkedOutputFile,
                         RemoveComments = _removeComments,
-                        ShaderOutputFile = _shaderOutputFile
+                        ShaderOutputFile = _shaderOutputFile,
+                        LinkedOutputHeaderFile = _linkedOutputHeaderFile,
+                        GenerateShaders = _generateShaders,
+                        GenerateLinkedFiles = _generateLinkedFiles
                     };
                     var json = JsonConvert.SerializeObject(contentData);
                     File.WriteAllText(dlg.FileName, json);
                 }
             }, o => true);
+            GenerateFilesCommand = new RelayCommand(o =>
+            {
+                if (GenerateShaders) GenerateShadersCommand.Execute(null);
+                if (GenerateLinkedFiles) GenerateLinkedFileCommand.Execute(null);
+            }, o => GenerateShadersCommand.CanExecute(null) || GenerateLinkedFileCommand.CanExecute(null));
         }
 
         private void RemoveSelectedItemsFromList(ObservableCollection<string> targetList, IList<string> removeList, RelayCommand command, ListType listType)
@@ -247,9 +288,15 @@ namespace BitbendazLinker.ViewModels
             ShaderOutputFile = contentData.ShaderOutputFile;
             LinkedOutputFile = contentData.LinkedOutputFile;
             RemoveComments = contentData.RemoveComments;
+            LinkedOutputHeaderFile = contentData.LinkedOutputHeaderFile;
+            GenerateShaders = contentData.GenerateShaders;
+            GenerateLinkedFiles = contentData.GenerateLinkedFiles;
+            GenerateShadersCommand.InvokeCanExecuteChanged();
+            GenerateLinkedFileCommand.InvokeCanExecuteChanged();
+            GenerateFilesCommand.InvokeCanExecuteChanged();
         }
 
-        private void GenerateShaders(object o)
+        private void InvokeGenerateShaders(object o)
         {
             var (result, message) = LinkerLogic.GenerateShaders(_shaders, _shaderOutputFile, _removeComments);
             MessageBox.Show(result ? message : $"Error: {message}");
@@ -257,7 +304,7 @@ namespace BitbendazLinker.ViewModels
 
         private void GenerateDataFile(object o)
         {
-            var (result, message) = LinkerLogic.GenerateLinkedFile(Objects, Textures, _linkedOutputFile);
+            var (result, message) = LinkerLogic.GenerateLinkedFile(Objects, Textures, _linkedOutputFile, _linkedOutputHeaderFile);
             MessageBox.Show(result ? message : $"Error: {message}");
         }
     }
