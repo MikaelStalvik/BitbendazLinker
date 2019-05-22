@@ -226,29 +226,35 @@ namespace BitbendazLinker.ViewModels
             AddShadersCommand = new RelayCommand(o =>
             {
                 SelectFilesAndAddToList(Shaders, RemoveShadersCommand);
+                ShaderCount = Shaders.Count;
             }, o => true);
             RemoveShadersCommand = new RelayCommand(o =>
             {
                 RemoveSelectedItemsFromList(Shaders, SelectedShaders, RemoveShadersCommand, ListType.Shader);
+                ShaderCount = Shaders.Count;
             }, o => SelectedShaders?.Count > 0);
 
             AddObjectsCommand = new RelayCommand(o =>
             {
                 SelectFilesAndAddToList(Objects, RemoveObjectsCommand);
+                ObjectCount = Objects.Count;
             }, o => true);
             RemoveObjectsCommand = new RelayCommand(o =>
             {
                 RemoveSelectedItemsFromList(Objects, SelectedObjects, RemoveObjectsCommand, ListType.Object);
+                ObjectCount = Objects.Count;
             }, o => SelectedObjects?.Count > 0);
 
 
             AddTexturesCommand = new RelayCommand(o =>
             {
                 SelectFilesAndAddToList(Textures, RemoveTexturesCommand);
+                TextureCount = Textures.Count;
             }, o => true);
             RemoveTexturesCommand = new RelayCommand(o =>
             {
                 RemoveSelectedItemsFromList(Textures, SelectedTextures, RemoveTexturesCommand, ListType.Texture);
+                TextureCount = Textures.Count;
             }, o => SelectedTextures?.Count > 0);
 
             CloseCommand = new RelayCommand(o =>
@@ -307,7 +313,11 @@ namespace BitbendazLinker.ViewModels
             var dlg = new OpenFileDialog { Multiselect = true };
             if (dlg.ShowDialog() == true)
             {
-                foreach (var file in dlg.FileNames) targetList.Add(new FileHolder { Filename = file, Size = Extensions.GetFileSize(file) });
+                foreach (var file in dlg.FileNames)
+                {
+                    if (targetList.FirstOrDefault(x => x.Filename == file) == null)
+                        targetList.Add(new FileHolder { Filename = file, Size = Extensions.GetFileSize(file) });
+                }
                 command.InvokeCanExecuteChanged();
             }
         }

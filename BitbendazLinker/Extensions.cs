@@ -10,7 +10,9 @@ namespace BitbendazLinker
     {
         public static long GetFileSize(string filename)
         {
-            return new FileInfo(filename).Length;
+            if (File.Exists(filename))
+                return new FileInfo(filename).Length;
+            return 0;
         }
 
         public static List<T> ToList<T>(this ObservableCollection<T> source)
