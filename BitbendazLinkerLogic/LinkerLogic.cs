@@ -77,34 +77,39 @@ namespace BitbendazLinkerLogic
             return fi.Length;
         }
 
-        private static void GenerateBoilerplate(StringBuilder sb)
+        private static void GenerateBoilerplate(StringBuilder sb, bool hasObjects, bool hasTextures)
         {
-            sb.AppendLine("int offsetForObject(std::string resName)");
-            sb.AppendLine("{");
-            sb.AppendLine("  size_t n = sizeof(objectFileObjects) / sizeof(objectFileObjects[0]);");
-            sb.AppendLine("  for (int i = 0; i < n; i++)");
-            sb.AppendLine("  {");
-            sb.AppendLine("    if (objectFileObjects[i].filename == resName)");
-            sb.AppendLine("    {");
-            sb.AppendLine("      return objectFileObjects[i].offset;");
-            sb.AppendLine("    }");
-            sb.AppendLine("  }");
-            sb.AppendLine("  return -1;");
-            sb.AppendLine("}");
+            if (hasObjects)
+            {
+                sb.AppendLine("int offsetForObject(std::string resName)");
+                sb.AppendLine("{");
+                sb.AppendLine("  size_t n = sizeof(objectFileObjects) / sizeof(objectFileObjects[0]);");
+                sb.AppendLine("  for (int i = 0; i < n; i++)");
+                sb.AppendLine("  {");
+                sb.AppendLine("    if (objectFileObjects[i].filename == resName)");
+                sb.AppendLine("    {");
+                sb.AppendLine("      return objectFileObjects[i].offset;");
+                sb.AppendLine("    }");
+                sb.AppendLine("  }");
+                sb.AppendLine("  return -1;");
+                sb.AppendLine("}");
+            }
 
-            sb.AppendLine("int offsetForTexture(std::string resName)");
-            sb.AppendLine("{");
-            sb.AppendLine("  size_t n = sizeof(textureFileObjects) / sizeof(textureFileObjects[0]);");
-            sb.AppendLine("  for (int i = 0; i < n; i++)");
-            sb.AppendLine("  {");
-            sb.AppendLine("    if (textureFileObjects[i].filename == resName)");
-            sb.AppendLine("    {");
-            sb.AppendLine("      return textureFileObjects[i].offset;");
-            sb.AppendLine("    }");
-            sb.AppendLine("  }");
-            sb.AppendLine("  return -1;");
-            sb.AppendLine("}");
-
+            if (hasTextures)
+            {
+                sb.AppendLine("int offsetForTexture(std::string resName)");
+                sb.AppendLine("{");
+                sb.AppendLine("  size_t n = sizeof(textureFileObjects) / sizeof(textureFileObjects[0]);");
+                sb.AppendLine("  for (int i = 0; i < n; i++)");
+                sb.AppendLine("  {");
+                sb.AppendLine("    if (textureFileObjects[i].filename == resName)");
+                sb.AppendLine("    {");
+                sb.AppendLine("      return textureFileObjects[i].offset;");
+                sb.AppendLine("    }");
+                sb.AppendLine("  }");
+                sb.AppendLine("  return -1;");
+                sb.AppendLine("}");
+            }
             sb.AppendLine("}");
         }
 
@@ -148,18 +153,21 @@ namespace BitbendazLinkerLogic
             AddHeader(sb);
             long ofs = 0;
             var idx = 0;
-            sb.AppendLine($"FileObject objectFileObjects[{objects.Count()}] = {{");
-            foreach (var file in objects)
+            if (objects.Count() > 0)
             {
-                var l = GenerateFileBlock(sb, file, ofs);
-                ofs += l;
-                if (idx < objects.Count() - 1)
+                sb.AppendLine($"FileObject objectFileObjects[{objects.Count()}] = {{");
+                foreach (var file in objects)
                 {
-                    sb.AppendLine(",");
-                };
-                idx++;
+                    var l = GenerateFileBlock(sb, file, ofs);
+                    ofs += l;
+                    if (idx < objects.Count() - 1)
+                    {
+                        sb.AppendLine(",");
+                    };
+                    idx++;
+                }
+                sb.AppendLine("};");
             }
-            sb.AppendLine("};");
 
             idx = 0;
             sb.AppendLine($"FileObject textureFileObjects[{textures.Count()}] = {{");
@@ -175,7 +183,7 @@ namespace BitbendazLinkerLogic
             }
             sb.AppendLine("};");
 
-            GenerateBoilerplate(sb);
+            GenerateBoilerplate(sb, objects.Any(), textures.Any());
             SaveHeaderFile(sb, outputHeaderFilename);
             CreateLinkedFile(outputFilename, objects, textures);
             return (true, "Linked file created OK!");
