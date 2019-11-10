@@ -1,4 +1,4 @@
-﻿namespace BitbendazLinker.Models
+﻿namespace BitbendazLinkerClient.Models
 {
     public class FileHolder
     {

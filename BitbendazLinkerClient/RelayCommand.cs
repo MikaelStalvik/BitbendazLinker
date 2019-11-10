@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace BitbendazLinker
+namespace BitbendazLinkerClient
 {
     public class RelayCommand : ICommand
     {

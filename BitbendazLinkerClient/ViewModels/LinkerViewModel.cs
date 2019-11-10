@@ -1,4 +1,4 @@
-﻿using BitbendazLinker.Models;
+﻿using BitbendazLinkerClient.Models;
 using BitbendazLinkerLogic;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace BitbendazLinker.ViewModels
+namespace BitbendazLinkerClient.ViewModels
 {
     public enum ListType
     {
@@ -172,16 +172,12 @@ namespace BitbendazLinker.ViewModels
 
         private void OpenFileDialog(string defaultExt, string filter, Action<string> completeAction)
         {
-            var dlg = new OpenFileDialog();
-            dlg.DefaultExt = defaultExt;
-            dlg.Filter = filter;
+            var dlg = new OpenFileDialog {DefaultExt = defaultExt, Filter = filter};
             if (dlg.ShowDialog() == true) completeAction(dlg.FileName);
         }
         private void SaveFileDialog(string defaultExt, string filter, Action<string> completeAction)
         {
-            var dlg = new SaveFileDialog();
-            dlg.DefaultExt = defaultExt;
-            dlg.Filter = filter;
+            var dlg = new SaveFileDialog {DefaultExt = defaultExt, Filter = filter};
             if (dlg.ShowDialog() == true) completeAction(dlg.FileName);
         }
         public LinkerViewModel()

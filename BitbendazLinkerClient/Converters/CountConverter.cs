@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace BitbendazLinker.Converters
+namespace BitbendazLinkerClient.Converters
 {
     public class CountConverter : IValueConverter
     {

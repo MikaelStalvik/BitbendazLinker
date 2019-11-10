@@ -1,10 +1,10 @@
-﻿using BitbendazLinker.Models;
+﻿using BitbendazLinkerClient.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
-namespace BitbendazLinker
+namespace BitbendazLinkerClient
 {
     public static class Extensions
     {

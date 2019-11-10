@@ -1,17 +1,17 @@
-﻿using BitbendazLinker.Models;
-using BitbendazLinker.ViewModels;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using BitbendazLinkerClient.Models;
+using BitbendazLinkerClient.ViewModels;
 
-namespace BitbendazLinker
+namespace BitbendazLinkerClient
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private LinkerViewModel _viewModel = new LinkerViewModel();
+        private readonly LinkerViewModel _viewModel = new LinkerViewModel();
         public MainWindow()
         {
             InitializeComponent();

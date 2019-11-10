@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitbendazLinker", "BitbendazLinker\BitbendazLinker.csproj", "{D84DFD83-E359-414F-83B0-F81E4DB8A2A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitbendazLinkerLogic", "BitbendazLinkerLogic\BitbendazLinkerLogic.csproj", "{CF836002-8991-403E-856B-270840B73422}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitbendazLinkerLogic", "BitbendazLinkerLogic\BitbendazLinkerLogic.csproj", "{CF836002-8991-403E-856B-270840B73422}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitbendazLinkerCli", "BitbendazLinkerCli\BitbendazLinkerCli.csproj", "{FFD8D8A0-372F-49C9-9E0F-929B4E05BD47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitbendazLinkerCli", "BitbendazLinkerCli\BitbendazLinkerCli.csproj", "{FFD8D8A0-372F-49C9-9E0F-929B4E05BD47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitbendazLinkerClient", "BitbendazLinkerClient\BitbendazLinkerClient.csproj", "{8F474728-9AE7-4E43-8387-4765214F3123}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D84DFD83-E359-414F-83B0-F81E4DB8A2A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D84DFD83-E359-414F-83B0-F81E4DB8A2A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D84DFD83-E359-414F-83B0-F81E4DB8A2A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D84DFD83-E359-414F-83B0-F81E4DB8A2A5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CF836002-8991-403E-856B-270840B73422}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CF836002-8991-403E-856B-270840B73422}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF836002-8991-403E-856B-270840B73422}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +23,10 @@ Global
 		{FFD8D8A0-372F-49C9-9E0F-929B4E05BD47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFD8D8A0-372F-49C9-9E0F-929B4E05BD47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFD8D8A0-372F-49C9-9E0F-929B4E05BD47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F474728-9AE7-4E43-8387-4765214F3123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F474728-9AE7-4E43-8387-4765214F3123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F474728-9AE7-4E43-8387-4765214F3123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F474728-9AE7-4E43-8387-4765214F3123}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
