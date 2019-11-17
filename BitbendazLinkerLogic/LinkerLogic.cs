@@ -134,7 +134,7 @@ namespace BitbendazLinkerLogic
             File.WriteAllText(outputFilename, sb.ToString());
         }
 
-        private static void CreateLinkedFile(string outputFilename, IEnumerable<string> objects, IEnumerable<string> textures)
+        private static void CreateLinkedFile(string outputFilename, IEnumerable<string> objects, IEnumerable<string> textures, IEnumerable<string> embeded)
         {
             using (var destFile = new FileStream(outputFilename, FileMode.Create))
             {
@@ -148,6 +148,15 @@ namespace BitbendazLinkerLogic
                     }
                 }
                 foreach (var file in textures)
+                {
+                    using (var src = new FileStream(file, FileMode.Open))
+                    {
+                        var buf = new byte[src.Length];
+                        src.Read(buf, 0, buf.Length);
+                        destFile.Write(buf, 0, buf.Length);
+                    }
+                }
+                foreach (var file in embeded)
                 {
                     using (var src = new FileStream(file, FileMode.Open))
                     {
@@ -215,7 +224,7 @@ namespace BitbendazLinkerLogic
 
             GenerateBoilerplate(sb, objects.Any(), textures.Any(), embedded.Any());
             SaveHeaderFile(sb, outputHeaderFilename);
-            CreateLinkedFile(outputFilename, objects, textures);
+            CreateLinkedFile(outputFilename, objects, textures, embedded);
             return (true, "Linked file created OK!");
         }
     }
