@@ -27,7 +27,7 @@ namespace BitbendazLinkerLogic
         {
             if (!shaderFiles.Any()) return (false, "No shaders selected");
             var sb = new StringBuilder();
-            sb.AppendLine("namespace {");
+            sb.AppendLine("namespace Bitbendaz {");
             foreach (var shaderFile in shaderFiles)
             {
                 var sourceData = File.ReadAllLines(shaderFile);
@@ -55,7 +55,7 @@ namespace BitbendazLinkerLogic
         private static void AddHeader(StringBuilder sb)
         {
             sb.AppendLine("#include <string>");
-            sb.AppendLine("namespace {");
+            sb.AppendLine("namespace Bitbendaz {");
             sb.AppendLine("  struct FileObject");
             sb.AppendLine("  {");
             sb.AppendLine("    int offset;");
@@ -81,7 +81,7 @@ namespace BitbendazLinkerLogic
         {
             if (hasObjects)
             {
-                sb.AppendLine("int offsetForObject(std::string resName)");
+                sb.AppendLine("static int offsetForObject(std::string resName)");
                 sb.AppendLine("{");
                 sb.AppendLine("  size_t n = sizeof(objectFileObjects) / sizeof(objectFileObjects[0]);");
                 sb.AppendLine("  for (int i = 0; i < n; i++)");
@@ -97,7 +97,7 @@ namespace BitbendazLinkerLogic
 
             if (hasEmbedded)
             {
-                sb.AppendLine("auto offsetForEmbedded(std::string resName)");
+                sb.AppendLine("static auto offsetForEmbedded(std::string resName)");
                 sb.AppendLine("{");
                 sb.AppendLine("  size_t n = sizeof(embeddedFileObjects) / sizeof(embeddedFileObjects[0]);");
                 sb.AppendLine("  for (auto i = 0; i < n; i++)");
@@ -113,7 +113,7 @@ namespace BitbendazLinkerLogic
 
             if (hasTextures)
             {
-                sb.AppendLine("int offsetForTexture(std::string resName)");
+                sb.AppendLine("static int offsetForTexture(std::string resName)");
                 sb.AppendLine("{");
                 sb.AppendLine("  size_t n = sizeof(textureFileObjects) / sizeof(textureFileObjects[0]);");
                 sb.AppendLine("  for (int i = 0; i < n; i++)");
@@ -171,7 +171,7 @@ namespace BitbendazLinkerLogic
             var idx = 0;
             if (objects.Count() > 0)
             {
-                sb.AppendLine($"FileObject objectFileObjects[{objects.Count()}] = {{");
+                sb.AppendLine($"static FileObject objectFileObjects[{objects.Count()}] = {{");
                 foreach (var file in objects)
                 {
                     var l = GenerateFileBlock(sb, file, ofs);
@@ -186,7 +186,7 @@ namespace BitbendazLinkerLogic
             }
 
             idx = 0;
-            sb.AppendLine($"FileObject textureFileObjects[{textures.Count()}] = {{");
+            sb.AppendLine($"static FileObject textureFileObjects[{textures.Count()}] = {{");
             foreach (var file in textures)
             {
                 var l = GenerateFileBlock(sb, file, ofs);
@@ -200,7 +200,7 @@ namespace BitbendazLinkerLogic
             sb.AppendLine("};");
 
             idx = 0;
-            sb.AppendLine($"FileObject embeddedFileObjects[{embedded.Count()}] = {{");
+            sb.AppendLine($"static FileObject embeddedFileObjects[{embedded.Count()}] = {{");
             foreach (var file in embedded)
             {
                 var l = GenerateFileBlock(sb, file, ofs);
