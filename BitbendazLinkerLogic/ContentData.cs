@@ -7,6 +7,7 @@ namespace BitbendazLinkerLogic
         public List<string> Shaders { get; set; }
         public List<string> Objects { get; set; }
         public List<string> Textures { get; set; }
+        public List<string> Embedded { get; set; }
         public string ShaderOutputFile { get; set; }
         public string LinkedOutputFile { get; set; }
         public string LinkedOutputHeaderFile { get; set; }

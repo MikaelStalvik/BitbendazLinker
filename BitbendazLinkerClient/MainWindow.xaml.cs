@@ -35,7 +35,7 @@ namespace BitbendazLinkerClient
             var listBox = (ListBox)sender;
             _viewModel.SelectedObjects = listBox.SelectedItems.Cast<FileHolder>().ToList();
         }
-        private void ListBoxEmbeddd_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ListBoxEmbedded_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var listBox = (ListBox)sender;
             _viewModel.SelectedObjects = listBox.SelectedItems.Cast<FileHolder>().ToList();

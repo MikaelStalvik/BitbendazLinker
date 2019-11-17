@@ -77,7 +77,7 @@ namespace BitbendazLinkerLogic
             return fi.Length;
         }
 
-        private static void GenerateBoilerplate(StringBuilder sb, bool hasObjects, bool hasTextures)
+        private static void GenerateBoilerplate(StringBuilder sb, bool hasObjects, bool hasTextures, bool hasEmbedded)
         {
             if (hasObjects)
             {
@@ -89,6 +89,22 @@ namespace BitbendazLinkerLogic
                 sb.AppendLine("    if (objectFileObjects[i].filename == resName)");
                 sb.AppendLine("    {");
                 sb.AppendLine("      return objectFileObjects[i].offset;");
+                sb.AppendLine("    }");
+                sb.AppendLine("  }");
+                sb.AppendLine("  return -1;");
+                sb.AppendLine("}");
+            }
+
+            if (hasEmbedded)
+            {
+                sb.AppendLine("auto offsetForEmbedded(std::string resName)");
+                sb.AppendLine("{");
+                sb.AppendLine("  size_t n = sizeof(embeddedFileObjects) / sizeof(embeddedFileObjects[0]);");
+                sb.AppendLine("  for (auto i = 0; i < n; i++)");
+                sb.AppendLine("  {");
+                sb.AppendLine("    if (embeddedFileObjects[i].filename == resName)");
+                sb.AppendLine("    {");
+                sb.AppendLine("      return embeddedFileObjects[i].offset;");
                 sb.AppendLine("    }");
                 sb.AppendLine("  }");
                 sb.AppendLine("  return -1;");
@@ -143,7 +159,7 @@ namespace BitbendazLinkerLogic
             }
         }
 
-        public static (bool, string) GenerateLinkedFile(IEnumerable<string> objects, IEnumerable<string> textures, string outputFilename, string outputHeaderFilename)
+        public static (bool, string) GenerateLinkedFile(IEnumerable<string> objects, IEnumerable<string> textures, IEnumerable<string> embedded, string outputFilename, string outputHeaderFilename)
         {
             if (string.IsNullOrWhiteSpace(outputFilename))
                 return (false, "Output filename not defined");
@@ -183,7 +199,21 @@ namespace BitbendazLinkerLogic
             }
             sb.AppendLine("};");
 
-            GenerateBoilerplate(sb, objects.Any(), textures.Any());
+            idx = 0;
+            sb.AppendLine($"FileObject embeddedFileObjects[{embedded.Count()}] = {{");
+            foreach (var file in embedded)
+            {
+                var l = GenerateFileBlock(sb, file, ofs);
+                ofs += l;
+                if (idx < embedded.Count() - 1)
+                {
+                    sb.AppendLine(",");
+                };
+                idx++;
+            }
+            sb.AppendLine("};");
+
+            GenerateBoilerplate(sb, objects.Any(), textures.Any(), embedded.Any());
             SaveHeaderFile(sb, outputHeaderFilename);
             CreateLinkedFile(outputFilename, objects, textures);
             return (true, "Linked file created OK!");

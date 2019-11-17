@@ -133,7 +133,7 @@
                         <RowDefinition Height="32"/>
                     </Grid.RowDefinitions>
                     <ListBox 
-                        ItemsSource="{Binding Textures, Mode=TwoWay}"
+                        ItemsSource="{Binding Embedded, Mode=TwoWay}"
                         ItemTemplate="{StaticResource FileTemplate}"
                         Grid.Row="0" 
                         SelectionMode="Extended" 
