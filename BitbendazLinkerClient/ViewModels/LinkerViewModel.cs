@@ -15,7 +15,8 @@ namespace BitbendazLinkerClient.ViewModels
     {
         Shader,
         Object,
-        Texture
+        Texture,
+        EmbeddedObjects
     }
 
     public class LinkerViewModel : ViewModelBase
@@ -105,6 +106,36 @@ namespace BitbendazLinkerClient.ViewModels
             }
         }
 
+
+        private ObservableCollection<FileHolder> _embedded;
+        public ObservableCollection<FileHolder> Embedded
+        {
+            get => _embedded;
+            set
+            {
+                SetProperty(ref _embedded, value);
+                EmbeddedCount= Embedded.Count;
+            }
+        }
+        private int _embeddedCount;
+        public int EmbeddedCount
+        {
+            get => _embeddedCount;
+            set => SetProperty(ref _embeddedCount, value);
+        }
+        private List<FileHolder> _selectedEmbedded;
+        public List<FileHolder> SelectedEmbedded
+        {
+            get => _selectedEmbedded;
+            set
+            {
+                SetProperty(ref _selectedEmbedded, value);
+                RemoveEmbeddedCommand.InvokeCanExecuteChanged();
+            }
+        }
+
+
+
         private string _indexFile;
         public string IndexFile
         {
@@ -169,6 +200,8 @@ namespace BitbendazLinkerClient.ViewModels
         public RelayCommand CloseCommand { get; }
         public RelayCommand SaveProjectCommand { get; }
         public RelayCommand GenerateFilesCommand { get; }
+        public RelayCommand AddEmbeddedCommand { get; }
+        public RelayCommand RemoveEmbeddedCommand { get; }
 
         private void OpenFileDialog(string defaultExt, string filter, Action<string> completeAction)
         {
@@ -252,6 +285,17 @@ namespace BitbendazLinkerClient.ViewModels
                 RemoveSelectedItemsFromList(Textures, SelectedTextures, RemoveTexturesCommand, ListType.Texture);
                 TextureCount = Textures.Count;
             }, o => SelectedTextures?.Count > 0);
+
+            AddEmbeddedCommand = new RelayCommand(o =>
+            {
+                SelectFilesAndAddToList(Embedded, RemoveEmbeddedCommand);
+                EmbeddedCount = Embedded.Count;
+            }, o => true);
+            RemoveEmbeddedCommand = new RelayCommand(o =>
+            {
+                RemoveSelectedItemsFromList(Embedded, SelectedEmbedded, RemoveEmbeddedCommand, ListType.EmbeddedObjects);
+                EmbeddedCount = Embedded.Count;
+            }, o => SelectedEmbedded?.Count > 0);
 
             CloseCommand = new RelayCommand(o =>
             {
