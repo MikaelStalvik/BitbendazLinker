@@ -79,6 +79,7 @@
                     </ListBox>
                     <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,0,0,0">
                         <Button Width="80" Content="Add..." Command="{Binding AddShadersCommand}"/>
+                        <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadShadersCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveShadersCommand}"/>
                         <TextBlock DockPanel.Dock="Right" Text="{Binding ShaderCount, Converter={StaticResource CountConverter}}"/>
                     </DockPanel>
@@ -100,6 +101,7 @@
                         HorizontalContentAlignment="Stretch"/>
                     <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,0,0,0">
                         <Button Width="80" Content="Add..." Command="{Binding AddObjectsCommand}"/>
+                        <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadObjectsCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveObjectsCommand}"/>
                         <TextBlock DockPanel.Dock="Right" Text="{Binding ObjectCount, Converter={StaticResource CountConverter}}"/>
                     </DockPanel>
@@ -121,8 +123,31 @@
                         HorizontalContentAlignment="Stretch"/>
                     <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,0,0,0">
                         <Button Width="80" Content="Add..." Command="{Binding AddTexturesCommand}"/>
+                        <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadObjectsCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveTexturesCommand}"/>
                         <TextBlock DockPanel.Dock="Right" Text="{Binding TextureCount, Converter={StaticResource CountConverter}}"/>
+                    </DockPanel>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Embedded">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="32"/>
+                    </Grid.RowDefinitions>
+                    <ListBox 
+                        ItemsSource="{Binding Embedded, Mode=TwoWay}"
+                        ItemTemplate="{StaticResource FileTemplate}"
+                        Grid.Row="0" 
+                        SelectionMode="Extended" 
+                        SelectionChanged="ListBoxEmbedded_SelectionChanged" 
+                        AlternationCount="2"
+                        HorizontalContentAlignment="Stretch"/>
+                    <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,0,0,0">
+                        <Button Width="80" Content="Add..." Command="{Binding AddEmbeddedCommand}"/>
+                        <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadEmbeddedCommand}"/>
+                        <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveEmbeddedCommand}"/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding EmbeddedCount, Converter={StaticResource CountConverter}}"/>
                     </DockPanel>
                 </Grid>
             </TabItem>

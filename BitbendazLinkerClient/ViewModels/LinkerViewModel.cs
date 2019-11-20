@@ -15,7 +15,8 @@ namespace BitbendazLinkerClient.ViewModels
     {
         Shader,
         Object,
-        Texture
+        Texture,
+        EmbeddedObjects
     }
 
     public class LinkerViewModel : ViewModelBase
@@ -105,6 +106,36 @@ namespace BitbendazLinkerClient.ViewModels
             }
         }
 
+
+        private ObservableCollection<FileHolder> _embedded;
+        public ObservableCollection<FileHolder> Embedded
+        {
+            get => _embedded;
+            set
+            {
+                SetProperty(ref _embedded, value);
+                EmbeddedCount = Embedded.Count;
+            }
+        }
+        private int _embeddedCount;
+        public int EmbeddedCount
+        {
+            get => _embeddedCount;
+            set => SetProperty(ref _embeddedCount, value);
+        }
+        private List<FileHolder> _selectedEmbedded;
+        public List<FileHolder> SelectedEmbedded
+        {
+            get => _selectedEmbedded;
+            set
+            {
+                SetProperty(ref _selectedEmbedded, value);
+                RemoveEmbeddedCommand.InvokeCanExecuteChanged();
+            }
+        }
+
+
+
         private string _indexFile;
         public string IndexFile
         {
@@ -158,26 +189,32 @@ namespace BitbendazLinkerClient.ViewModels
         public RelayCommand GenerateShadersCommand { get; }
         public RelayCommand BrowseShaderOutputFileCommand { get; }
         public RelayCommand AddShadersCommand { get; }
+        public RelayCommand LoadShadersCommand { get; }
         public RelayCommand RemoveShadersCommand { get; }
         public RelayCommand BrowseLinkedOutputFileCommand { get; }
         public RelayCommand BrowseLinkedOutputHeaderFileCommand { get; }
         public RelayCommand GenerateLinkedFileCommand { get; }
         public RelayCommand AddTexturesCommand { get; }
+        public RelayCommand LoadTexturesCommand { get; }
         public RelayCommand RemoveTexturesCommand { get; }
         public RelayCommand AddObjectsCommand { get; }
+        public RelayCommand LoadObjectsCommand { get; }
         public RelayCommand RemoveObjectsCommand { get; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand SaveProjectCommand { get; }
         public RelayCommand GenerateFilesCommand { get; }
+        public RelayCommand AddEmbeddedCommand { get; }
+        public RelayCommand LoadEmbeddedCommand { get; }
+        public RelayCommand RemoveEmbeddedCommand { get; }
 
         private void OpenFileDialog(string defaultExt, string filter, Action<string> completeAction)
         {
-            var dlg = new OpenFileDialog {DefaultExt = defaultExt, Filter = filter};
+            var dlg = new OpenFileDialog { DefaultExt = defaultExt, Filter = filter };
             if (dlg.ShowDialog() == true) completeAction(dlg.FileName);
         }
         private void SaveFileDialog(string defaultExt, string filter, Action<string> completeAction)
         {
-            var dlg = new SaveFileDialog {DefaultExt = defaultExt, Filter = filter};
+            var dlg = new SaveFileDialog { DefaultExt = defaultExt, Filter = filter };
             if (dlg.ShowDialog() == true) completeAction(dlg.FileName);
         }
         public LinkerViewModel()
@@ -185,9 +222,11 @@ namespace BitbendazLinkerClient.ViewModels
             Objects = new ObservableCollection<FileHolder>();
             Shaders = new ObservableCollection<FileHolder>();
             Textures = new ObservableCollection<FileHolder>();
+            Embedded = new ObservableCollection<FileHolder>();
             BrowseCommand = new RelayCommand(o =>
             {
-                OpenFileDialog(".json", JSON_FILTER, filename => {
+                OpenFileDialog(".json", JSON_FILTER, filename =>
+                {
                     IndexFile = filename;
                     LoadCommand.InvokeCanExecuteChanged();
                     LoadCommand.Execute(null);
@@ -197,7 +236,8 @@ namespace BitbendazLinkerClient.ViewModels
             GenerateShadersCommand = new RelayCommand(InvokeGenerateShaders, o => !string.IsNullOrWhiteSpace(_shaderOutputFile));
             BrowseShaderOutputFileCommand = new RelayCommand(o =>
             {
-                SaveFileDialog(".h", HEADER_FILTER, filename => {
+                SaveFileDialog(".h", HEADER_FILTER, filename =>
+                {
                     ShaderOutputFile = filename;
                     GenerateShadersCommand.InvokeCanExecuteChanged();
                 });
@@ -212,7 +252,8 @@ namespace BitbendazLinkerClient.ViewModels
             }, o => true);
             BrowseLinkedOutputHeaderFileCommand = new RelayCommand(o =>
             {
-                SaveFileDialog(".h", HEADER_FILTER, filename => {
+                SaveFileDialog(".h", HEADER_FILTER, filename =>
+                {
                     LinkedOutputHeaderFile = filename;
                     GenerateLinkedFileCommand.InvokeCanExecuteChanged();
                 });
@@ -224,6 +265,11 @@ namespace BitbendazLinkerClient.ViewModels
                 SelectFilesAndAddToList(Shaders, RemoveShadersCommand);
                 ShaderCount = Shaders.Count;
             }, o => true);
+            LoadShadersCommand = new RelayCommand(o =>
+            {
+                LoadFilesAndAddToList(Shaders, RemoveShadersCommand);
+                ShaderCount = Shaders.Count;
+            }, o => true);
             RemoveShadersCommand = new RelayCommand(o =>
             {
                 RemoveSelectedItemsFromList(Shaders, SelectedShaders, RemoveShadersCommand, ListType.Shader);
@@ -233,6 +279,11 @@ namespace BitbendazLinkerClient.ViewModels
             AddObjectsCommand = new RelayCommand(o =>
             {
                 SelectFilesAndAddToList(Objects, RemoveObjectsCommand);
+                ObjectCount = Objects.Count;
+            }, o => true);
+            LoadObjectsCommand = new RelayCommand(o =>
+            {
+                LoadFilesAndAddToList(Objects, RemoveObjectsCommand);
                 ObjectCount = Objects.Count;
             }, o => true);
             RemoveObjectsCommand = new RelayCommand(o =>
@@ -247,11 +298,32 @@ namespace BitbendazLinkerClient.ViewModels
                 SelectFilesAndAddToList(Textures, RemoveTexturesCommand);
                 TextureCount = Textures.Count;
             }, o => true);
+            LoadTexturesCommand = new RelayCommand(o =>
+            {
+                LoadFilesAndAddToList(Textures, RemoveTexturesCommand);
+                TextureCount = Textures.Count;
+            }, o => true);
             RemoveTexturesCommand = new RelayCommand(o =>
             {
                 RemoveSelectedItemsFromList(Textures, SelectedTextures, RemoveTexturesCommand, ListType.Texture);
                 TextureCount = Textures.Count;
             }, o => SelectedTextures?.Count > 0);
+
+            AddEmbeddedCommand = new RelayCommand(o =>
+            {
+                SelectFilesAndAddToList(Embedded, RemoveEmbeddedCommand);
+                EmbeddedCount = Embedded.Count;
+            }, o => true);
+            LoadEmbeddedCommand = new RelayCommand(o =>
+            {
+                LoadFilesAndAddToList(Embedded, RemoveEmbeddedCommand);
+                EmbeddedCount = Embedded.Count;
+            }, o => true);
+            RemoveEmbeddedCommand = new RelayCommand(o =>
+            {
+                RemoveSelectedItemsFromList(Embedded, SelectedEmbedded, RemoveEmbeddedCommand, ListType.EmbeddedObjects);
+                EmbeddedCount = Embedded.Count;
+            }, o => SelectedEmbedded?.Count > 0);
 
             CloseCommand = new RelayCommand(o =>
             {
@@ -260,12 +332,14 @@ namespace BitbendazLinkerClient.ViewModels
 
             SaveProjectCommand = new RelayCommand(o =>
             {
-                SaveFileDialog(".json", JSON_FILTER, filename => {
+                SaveFileDialog(".json", JSON_FILTER, filename =>
+                {
                     var contentData = new ContentData
                     {
                         Objects = Objects.ToList(),
                         Shaders = Shaders.ToList(),
                         Textures = Textures.ToList(),
+                        Embedded = Embedded.ToList(),
                         LinkedOutputFile = _linkedOutputFile,
                         RemoveComments = _removeComments,
                         ShaderOutputFile = _shaderOutputFile,
@@ -296,9 +370,18 @@ namespace BitbendazLinkerClient.ViewModels
             }
             switch (listType)
             {
-                case ListType.Shader: Shaders = new ObservableCollection<FileHolder>(tmp); break;
-                case ListType.Object: Objects = new ObservableCollection<FileHolder>(tmp); break;
-                case ListType.Texture: Textures = new ObservableCollection<FileHolder>(tmp); break;
+                case ListType.Shader:
+                    Shaders = new ObservableCollection<FileHolder>(tmp); 
+                    break;
+                case ListType.Object:
+                    Objects = new ObservableCollection<FileHolder>(tmp);
+                    break;
+                case ListType.Texture:
+                    Textures = new ObservableCollection<FileHolder>(tmp);
+                    break;
+                case ListType.EmbeddedObjects:
+                    Embedded = new ObservableCollection<FileHolder>(tmp);
+                    break;
             }
             removeList.Clear();
             command.InvokeCanExecuteChanged();
@@ -317,6 +400,24 @@ namespace BitbendazLinkerClient.ViewModels
                 command.InvokeCanExecuteChanged();
             }
         }
+        private void LoadFilesAndAddToList(ObservableCollection<FileHolder> targetList, RelayCommand command)
+        {
+            var dlg = new OpenFileDialog { Multiselect = false, DefaultExt = ".txt"};
+            if (dlg.ShowDialog() == true)
+            {
+                var lines = File.ReadAllLines(dlg.FileName);
+                foreach (var file in lines)
+                {
+                    if (File.Exists(file))
+                    {
+                        if (targetList.FirstOrDefault(x => x.Filename == file) == null)
+                            targetList.Add(new FileHolder {Filename = file, Size = Extensions.GetFileSize(file)});
+                    }
+                }
+                command.InvokeCanExecuteChanged();
+            }
+        }
+
         private void LoadFromFile(object o)
         {
             var json = File.ReadAllText(_indexFile);
@@ -324,6 +425,7 @@ namespace BitbendazLinkerClient.ViewModels
             Shaders = contentData.Shaders.ToFileHolder();
             Objects = contentData.Objects.ToFileHolder();
             Textures = contentData.Textures.ToFileHolder();
+            Embedded = contentData.Embedded == null ? new ObservableCollection<FileHolder>() : contentData.Embedded.ToFileHolder();
             ShaderOutputFile = contentData.ShaderOutputFile;
             LinkedOutputFile = contentData.LinkedOutputFile;
             RemoveComments = contentData.RemoveComments;
@@ -343,7 +445,7 @@ namespace BitbendazLinkerClient.ViewModels
 
         private void GenerateDataFile(object o)
         {
-            var (result, message) = LinkerLogic.GenerateLinkedFile(Objects.ToList(), Textures.ToList(), _linkedOutputFile, _linkedOutputHeaderFile);
+            var (result, message) = LinkerLogic.GenerateLinkedFile(Objects.ToList(), Textures.ToList(),  Embedded.ToList(), _linkedOutputFile, _linkedOutputHeaderFile);
             MessageBox.Show(result ? message : $"Error: {message}");
         }
     }
