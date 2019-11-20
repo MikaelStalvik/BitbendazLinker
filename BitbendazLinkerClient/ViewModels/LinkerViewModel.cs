@@ -189,18 +189,22 @@ namespace BitbendazLinkerClient.ViewModels
         public RelayCommand GenerateShadersCommand { get; }
         public RelayCommand BrowseShaderOutputFileCommand { get; }
         public RelayCommand AddShadersCommand { get; }
+        public RelayCommand LoadShadersCommand { get; }
         public RelayCommand RemoveShadersCommand { get; }
         public RelayCommand BrowseLinkedOutputFileCommand { get; }
         public RelayCommand BrowseLinkedOutputHeaderFileCommand { get; }
         public RelayCommand GenerateLinkedFileCommand { get; }
         public RelayCommand AddTexturesCommand { get; }
+        public RelayCommand LoadTexturesCommand { get; }
         public RelayCommand RemoveTexturesCommand { get; }
         public RelayCommand AddObjectsCommand { get; }
+        public RelayCommand LoadObjectsCommand { get; }
         public RelayCommand RemoveObjectsCommand { get; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand SaveProjectCommand { get; }
         public RelayCommand GenerateFilesCommand { get; }
         public RelayCommand AddEmbeddedCommand { get; }
+        public RelayCommand LoadEmbeddedCommand { get; }
         public RelayCommand RemoveEmbeddedCommand { get; }
 
         private void OpenFileDialog(string defaultExt, string filter, Action<string> completeAction)
@@ -261,6 +265,11 @@ namespace BitbendazLinkerClient.ViewModels
                 SelectFilesAndAddToList(Shaders, RemoveShadersCommand);
                 ShaderCount = Shaders.Count;
             }, o => true);
+            LoadShadersCommand = new RelayCommand(o =>
+            {
+                LoadFilesAndAddToList(Shaders, RemoveShadersCommand);
+                ShaderCount = Shaders.Count;
+            }, o => true);
             RemoveShadersCommand = new RelayCommand(o =>
             {
                 RemoveSelectedItemsFromList(Shaders, SelectedShaders, RemoveShadersCommand, ListType.Shader);
@@ -270,6 +279,11 @@ namespace BitbendazLinkerClient.ViewModels
             AddObjectsCommand = new RelayCommand(o =>
             {
                 SelectFilesAndAddToList(Objects, RemoveObjectsCommand);
+                ObjectCount = Objects.Count;
+            }, o => true);
+            LoadObjectsCommand = new RelayCommand(o =>
+            {
+                LoadFilesAndAddToList(Objects, RemoveObjectsCommand);
                 ObjectCount = Objects.Count;
             }, o => true);
             RemoveObjectsCommand = new RelayCommand(o =>
@@ -284,6 +298,11 @@ namespace BitbendazLinkerClient.ViewModels
                 SelectFilesAndAddToList(Textures, RemoveTexturesCommand);
                 TextureCount = Textures.Count;
             }, o => true);
+            LoadTexturesCommand = new RelayCommand(o =>
+            {
+                LoadFilesAndAddToList(Textures, RemoveTexturesCommand);
+                TextureCount = Textures.Count;
+            }, o => true);
             RemoveTexturesCommand = new RelayCommand(o =>
             {
                 RemoveSelectedItemsFromList(Textures, SelectedTextures, RemoveTexturesCommand, ListType.Texture);
@@ -293,6 +312,11 @@ namespace BitbendazLinkerClient.ViewModels
             AddEmbeddedCommand = new RelayCommand(o =>
             {
                 SelectFilesAndAddToList(Embedded, RemoveEmbeddedCommand);
+                EmbeddedCount = Embedded.Count;
+            }, o => true);
+            LoadEmbeddedCommand = new RelayCommand(o =>
+            {
+                LoadFilesAndAddToList(Embedded, RemoveEmbeddedCommand);
                 EmbeddedCount = Embedded.Count;
             }, o => true);
             RemoveEmbeddedCommand = new RelayCommand(o =>
@@ -376,6 +400,24 @@ namespace BitbendazLinkerClient.ViewModels
                 command.InvokeCanExecuteChanged();
             }
         }
+        private void LoadFilesAndAddToList(ObservableCollection<FileHolder> targetList, RelayCommand command)
+        {
+            var dlg = new OpenFileDialog { Multiselect = false, DefaultExt = ".txt"};
+            if (dlg.ShowDialog() == true)
+            {
+                var lines = File.ReadAllLines(dlg.FileName);
+                foreach (var file in lines)
+                {
+                    if (File.Exists(file))
+                    {
+                        if (targetList.FirstOrDefault(x => x.Filename == file) == null)
+                            targetList.Add(new FileHolder {Filename = file, Size = Extensions.GetFileSize(file)});
+                    }
+                }
+                command.InvokeCanExecuteChanged();
+            }
+        }
+
         private void LoadFromFile(object o)
         {
             var json = File.ReadAllText(_indexFile);

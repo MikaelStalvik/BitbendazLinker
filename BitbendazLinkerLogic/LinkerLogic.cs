@@ -31,7 +31,12 @@ namespace BitbendazLinkerLogic
             foreach (var shaderFile in shaderFiles)
             {
                 var sourceData = File.ReadAllLines(shaderFile);
-                var name = Path.GetFileName(shaderFile).Replace(Path.GetExtension(shaderFile), "_min");
+                var ext = Path.GetExtension(shaderFile);
+                var suffix = ext.Replace(".", "_");
+                suffix += "_min";
+                var name = Path.GetFileName(shaderFile).Replace(ext, string.Empty);
+                name = name.Replace("-", "_");
+                name += suffix;
                 sb.AppendLine($"const char *{name} =");
                 var nl = "\\n";
                 foreach (var s in sourceData)
@@ -41,7 +46,8 @@ namespace BitbendazLinkerLogic
                     {
                         if (!ts.StartsWith(@"//"))
                         {
-                            sb.AppendLine($"\"{s}{nl}\"");
+                            var adjusted = s.Replace("\"", "\"\"");
+                            sb.AppendLine($"\"{adjusted}{nl}\"");
                         }
                     }
                 }
@@ -83,8 +89,8 @@ namespace BitbendazLinkerLogic
             {
                 sb.AppendLine("static int offsetForObject(std::string resName)");
                 sb.AppendLine("{");
-                sb.AppendLine("  size_t n = sizeof(objectFileObjects) / sizeof(objectFileObjects[0]);");
-                sb.AppendLine("  for (int i = 0; i < n; i++)");
+                sb.AppendLine("  auto n = sizeof(objectFileObjects) / sizeof(objectFileObjects[0]);");
+                sb.AppendLine("  for (auto i = 0; i < n; i++)");
                 sb.AppendLine("  {");
                 sb.AppendLine("    if (objectFileObjects[i].filename == resName)");
                 sb.AppendLine("    {");
@@ -99,7 +105,7 @@ namespace BitbendazLinkerLogic
             {
                 sb.AppendLine("static auto offsetForEmbedded(std::string resName)");
                 sb.AppendLine("{");
-                sb.AppendLine("  size_t n = sizeof(embeddedFileObjects) / sizeof(embeddedFileObjects[0]);");
+                sb.AppendLine("  auto n = sizeof(embeddedFileObjects) / sizeof(embeddedFileObjects[0]);");
                 sb.AppendLine("  for (auto i = 0; i < n; i++)");
                 sb.AppendLine("  {");
                 sb.AppendLine("    if (embeddedFileObjects[i].filename == resName)");
@@ -115,8 +121,8 @@ namespace BitbendazLinkerLogic
             {
                 sb.AppendLine("static int offsetForTexture(std::string resName)");
                 sb.AppendLine("{");
-                sb.AppendLine("  size_t n = sizeof(textureFileObjects) / sizeof(textureFileObjects[0]);");
-                sb.AppendLine("  for (int i = 0; i < n; i++)");
+                sb.AppendLine("  auto n = sizeof(textureFileObjects) / sizeof(textureFileObjects[0]);");
+                sb.AppendLine("  for (auto i = 0; i < n; i++)");
                 sb.AppendLine("  {");
                 sb.AppendLine("    if (textureFileObjects[i].filename == resName)");
                 sb.AppendLine("    {");
