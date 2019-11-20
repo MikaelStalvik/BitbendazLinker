@@ -64,7 +64,7 @@ namespace BitbendazLinkerCli
                 var json = File.ReadAllText(projectFile);
                 var contentData = JsonConvert.DeserializeObject<ContentData>(json);
                 LinkerLogic.GenerateShaders(contentData.Shaders, shaderOutputFile, removeComments);
-                LinkerLogic.GenerateLinkedFile(contentData.Objects, contentData.Textures, linkedOutputFile, linkedOutputHeaderFile);
+                LinkerLogic.GenerateLinkedFile(contentData.Objects, contentData.Textures,  contentData.Embedded, linkedOutputFile, linkedOutputHeaderFile);
                 Console.WriteLine($"  {shaderOutputFile} generated with no issues.");
                 Console.WriteLine($"  {linkedOutputFile} generated with no issues.");
             }
