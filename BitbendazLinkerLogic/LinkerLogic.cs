@@ -23,11 +23,41 @@ namespace BitbendazLinkerLogic
             return noComments;
         }
 
+        private static string ShaderHeader()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("#include <map>");
+            sb.AppendLine("#include <string>");
+            sb.AppendLine("");
+            sb.AppendLine("namespace Bitbendaz");
+            sb.AppendLine("{");
+            sb.AppendLine(" using namespace std;");
+            sb.AppendLine(" class generated_shaders");
+            sb.AppendLine(" {");
+            sb.AppendLine("private:");
+            return sb.ToString();
+        }
+
+        private static string ShaderFooter()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("public:");
+            sb.AppendLine("string get_shader(string key)");
+            sb.AppendLine("{");
+            sb.AppendLine(" return shader_table[key];");
+            sb.AppendLine("}");
+            sb.AppendLine("};");
+            sb.AppendLine("}");
+            return sb.ToString();
+        }
+
         public static (bool, string) GenerateShaders(IEnumerable<string> shaderFiles, string outputFilename, bool stripComments)
         {
             if (!shaderFiles.Any()) return (false, "No shaders selected");
             var sb = new StringBuilder();
-            sb.AppendLine("namespace Bitbendaz {");
+            sb.AppendLine(ShaderHeader());
+            sb.AppendLine("map<std::string, std::string> shader_table{");
+
             foreach (var shaderFile in shaderFiles)
             {
                 var sourceData = File.ReadAllLines(shaderFile);
@@ -37,8 +67,8 @@ namespace BitbendazLinkerLogic
                 var name = Path.GetFileName(shaderFile).Replace(ext, string.Empty);
                 name = name.Replace("-", "_");
                 name += suffix;
-                sb.AppendLine($"const char *{name} =");
-                var nl = "\\n";
+                const string nl = "\\n";
+                sb.AppendLine("{\"" + name + "\",");
                 foreach (var s in sourceData)
                 {
                     var ts = s.Trim();
@@ -51,9 +81,12 @@ namespace BitbendazLinkerLogic
                         }
                     }
                 }
-                sb.Append(";");
+
+                sb.AppendLine("},");
+
             }
-            sb.AppendLine("}");
+            sb.AppendLine("};");
+            sb.AppendLine(ShaderFooter());
             File.WriteAllText(outputFilename, stripComments ? StripComments(sb.ToString()) : sb.ToString());
             return (true, "Shaders minified ok!");
         }
