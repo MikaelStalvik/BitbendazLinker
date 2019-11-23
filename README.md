@@ -9,6 +9,7 @@ The tool will also link multiple binary files into one large file and also gener
 Bitbendaz Linker Tool comes with a GUI application (Windows only) and a CLI version which works on Windows, Linux and MacOs (requires .NET Core installed)
 
 ## Using generated files
+(This section need to be updated)
 
 In your C/C++ project include the generated .h files.
 
@@ -27,7 +28,7 @@ Each entry in the generated dictionary contains: offset in bytes, size in bytes 
 
 
 ## Requirements
-.NET Framework 4.7.2 (WPF client) and .NET Core (2.1).
+.NET Code 3.
 
 VisualStudio 2019 is recommended for compiling the WPF client.
 
