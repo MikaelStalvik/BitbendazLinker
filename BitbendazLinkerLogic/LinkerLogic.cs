@@ -93,6 +93,9 @@ namespace BitbendazLinkerLogic
 
         private static void AddHeader(StringBuilder sb)
         {
+            sb.AppendLine("#ifndef  _LINKED_HEADER_");
+            sb.AppendLine("#define _LINKED_HEADER_");
+
             sb.AppendLine("#include <string>");
             sb.AppendLine("namespace Bitbendaz {");
             sb.AppendLine("  struct FileObject");
@@ -262,6 +265,7 @@ namespace BitbendazLinkerLogic
             sb.AppendLine("};");
 
             GenerateBoilerplate(sb, objects.Any(), textures.Any(), embedded.Any());
+            sb.AppendLine("#endif");
             SaveHeaderFile(sb, outputHeaderFilename);
             CreateLinkedFile(outputFilename, objects, textures, embedded);
             return (true, "Linked file created OK!");
