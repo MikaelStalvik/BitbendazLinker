@@ -33,7 +33,7 @@ Each entry in the generated dictionary contains: offset in bytes, size in bytes 
 
 
 ## Requirements
-.NET Code 3.
+.NET Core 3.
 
 VisualStudio 2019 is recommended for compiling the WPF client.
 
