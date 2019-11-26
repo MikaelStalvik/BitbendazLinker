@@ -59,6 +59,7 @@
                     </DockPanel>
                     <CheckBox IsChecked="{Binding GenerateShaders}" Margin="132,8,0,0" Content="Generate shaders"/>
                     <CheckBox IsChecked="{Binding GenerateLinkedFiles}" Margin="132,4,0,0" Content="Generate linked files"/>
+                    <CheckBox IsChecked="{Binding UseCompression}" Margin="132,4,0,0" Content="Use compression"/>
 
                 </StackPanel>
             </TabItem>

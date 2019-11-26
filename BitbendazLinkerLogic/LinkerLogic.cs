@@ -108,13 +108,13 @@ namespace BitbendazLinkerLogic
 
         private static long GenerateFileBlock(StringBuilder sb, string filename, long ofs)
         {
-            FileInfo fi = new FileInfo(filename);
+            var fi = new FileInfo(filename);
             sb.Append("{");
             sb.Append(ofs);
             sb.Append(",");
             sb.Append(fi.Length);
             sb.Append(", std::string(\"");
-            sb.Append(System.IO.Path.GetFileName(filename));
+            sb.Append(Path.GetFileName(filename));
             sb.Append("\")}");
             return fi.Length;
         }
@@ -176,9 +176,10 @@ namespace BitbendazLinkerLogic
             File.WriteAllText(outputFilename, sb.ToString());
         }
 
-        private static void CreateLinkedFile(string outputFilename, IEnumerable<string> objects, IEnumerable<string> textures, IEnumerable<string> embeded)
+        private static void CreateLinkedFile(string outputFilename, IEnumerable<string> objects, IEnumerable<string> textures, IEnumerable<string> embeded, bool useCompression)
         {
-            using (var destFile = new FileStream(outputFilename, FileMode.Create))
+            var tempName = Path.GetTempFileName();
+            using (var destFile = new FileStream(useCompression ? tempName : outputFilename, FileMode.Create))
             {
                 foreach (var file in objects)
                 {
@@ -208,9 +209,33 @@ namespace BitbendazLinkerLogic
                     }
                 }
             }
+
+            if (useCompression)
+            {
+                var buffer = File.ReadAllBytes(tempName);
+                var compressedData = Snappy.SnappyCodec.Compress(buffer);
+                using (var compressedFile = new FileStream(outputFilename, FileMode.Create))
+                {
+                    compressedFile.Write(compressedData, 0, compressedData.Length);
+                }
+                try
+                {
+                    File.Delete(tempName);
+                }
+                catch
+                {
+                    // just tolerate it..
+                }
+            }
         }
 
-        public static (bool, string) GenerateLinkedFile(IEnumerable<string> objects, IEnumerable<string> textures, IEnumerable<string> embedded, string outputFilename, string outputHeaderFilename)
+        public static (bool, string) GenerateLinkedFile(
+            IEnumerable<string> objects, 
+            IEnumerable<string> textures, 
+            IEnumerable<string> embedded, 
+            string outputFilename, 
+            string outputHeaderFilename, 
+            bool useCompression)
         {
             if (string.IsNullOrWhiteSpace(outputFilename))
                 return (false, "Output filename not defined");
@@ -220,7 +245,7 @@ namespace BitbendazLinkerLogic
             AddHeader(sb);
             long ofs = 0;
             var idx = 0;
-            if (objects.Count() > 0)
+            if (objects.Any())
             {
                 sb.AppendLine($"static FileObject objectFileObjects[{objects.Count()}] = {{");
                 foreach (var file in objects)
@@ -267,7 +292,7 @@ namespace BitbendazLinkerLogic
             GenerateBoilerplate(sb, objects.Any(), textures.Any(), embedded.Any());
             sb.AppendLine("#endif");
             SaveHeaderFile(sb, outputHeaderFilename);
-            CreateLinkedFile(outputFilename, objects, textures, embedded);
+            CreateLinkedFile(outputFilename, objects, textures, embedded, useCompression);
             return (true, "Linked file created OK!");
         }
     }

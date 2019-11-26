@@ -14,5 +14,6 @@ namespace BitbendazLinkerLogic
         public bool RemoveComments { get; set; }
         public bool GenerateShaders { get; set; }
         public bool GenerateLinkedFiles { get; set; }
+        public bool UseCompression { get; set; }
     }
 }
