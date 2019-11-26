@@ -184,6 +184,13 @@ namespace BitbendazLinkerClient.ViewModels
             set => SetProperty(ref _generateLinkedFiles, value);
         }
 
+        private bool _useCompression;
+        public bool UseCompression
+        {
+            get => _useCompression;
+            set => SetProperty(ref _useCompression, value);
+        }
+
         public RelayCommand BrowseCommand { get; }
         public RelayCommand LoadCommand { get; }
         public RelayCommand GenerateShadersCommand { get; }
@@ -327,7 +334,7 @@ namespace BitbendazLinkerClient.ViewModels
 
             CloseCommand = new RelayCommand(o =>
             {
-                Application.Current.MainWindow.Close();
+                Application.Current.MainWindow?.Close();
             }, o => true);
 
             SaveProjectCommand = new RelayCommand(o =>
@@ -345,7 +352,8 @@ namespace BitbendazLinkerClient.ViewModels
                         ShaderOutputFile = _shaderOutputFile,
                         LinkedOutputHeaderFile = _linkedOutputHeaderFile,
                         GenerateShaders = _generateShaders,
-                        GenerateLinkedFiles = _generateLinkedFiles
+                        GenerateLinkedFiles = _generateLinkedFiles,
+                        UseCompression = _useCompression
                     };
                     var json = JsonConvert.SerializeObject(contentData);
                     File.WriteAllText(filename, json);
@@ -371,7 +379,7 @@ namespace BitbendazLinkerClient.ViewModels
             switch (listType)
             {
                 case ListType.Shader:
-                    Shaders = new ObservableCollection<FileHolder>(tmp); 
+                    Shaders = new ObservableCollection<FileHolder>(tmp);
                     break;
                 case ListType.Object:
                     Objects = new ObservableCollection<FileHolder>(tmp);
@@ -402,7 +410,7 @@ namespace BitbendazLinkerClient.ViewModels
         }
         private void LoadFilesAndAddToList(ObservableCollection<FileHolder> targetList, RelayCommand command)
         {
-            var dlg = new OpenFileDialog { Multiselect = false, DefaultExt = ".txt"};
+            var dlg = new OpenFileDialog { Multiselect = false, DefaultExt = ".txt" };
             if (dlg.ShowDialog() == true)
             {
                 var lines = File.ReadAllLines(dlg.FileName);
@@ -411,7 +419,7 @@ namespace BitbendazLinkerClient.ViewModels
                     if (File.Exists(file))
                     {
                         if (targetList.FirstOrDefault(x => x.Filename == file) == null)
-                            targetList.Add(new FileHolder {Filename = file, Size = Extensions.GetFileSize(file)});
+                            targetList.Add(new FileHolder { Filename = file, Size = Extensions.GetFileSize(file) });
                     }
                 }
                 command.InvokeCanExecuteChanged();
@@ -432,6 +440,7 @@ namespace BitbendazLinkerClient.ViewModels
             LinkedOutputHeaderFile = contentData.LinkedOutputHeaderFile;
             GenerateShaders = contentData.GenerateShaders;
             GenerateLinkedFiles = contentData.GenerateLinkedFiles;
+            UseCompression = contentData.UseCompression;
             GenerateShadersCommand.InvokeCanExecuteChanged();
             GenerateLinkedFileCommand.InvokeCanExecuteChanged();
             GenerateFilesCommand.InvokeCanExecuteChanged();
@@ -445,7 +454,7 @@ namespace BitbendazLinkerClient.ViewModels
 
         private void GenerateDataFile(object o)
         {
-            var (result, message) = LinkerLogic.GenerateLinkedFile(Objects.ToList(), Textures.ToList(),  Embedded.ToList(), _linkedOutputFile, _linkedOutputHeaderFile);
+            var (result, message) = LinkerLogic.GenerateLinkedFile(Objects.ToList(), Textures.ToList(), Embedded.ToList(), _linkedOutputFile, _linkedOutputHeaderFile, _useCompression);
             MessageBox.Show(result ? message : $"Error: {message}");
         }
     }
