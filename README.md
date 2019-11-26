@@ -8,9 +8,14 @@ The tool will also link multiple binary files into one large file and also gener
 
 Bitbendaz Linker Tool comes with a GUI application (Windows only) and a CLI version which works on Windows, Linux and MacOs (requires .NET Core installed)
 
-## Using generated files
-(This section need to be updated)
+It is also possible to add files that are "embedded",
+Embedded files will be listed with an own offset TOC and is useful for objects that needs to be extracted (e.g. cannot be loaded directly from an iostream), instead being unpacked to a temp-folder or such.
 
+Exampes of files like these are 3D object files that needs textures in a folder relative to itself, for examples ./textures/mytexture.png.
+
+The target file with linked binary data can be compressed using Snappy (optional)
+
+## Using generated files
 In your C/C++ project include the generated .h files.
 
 To get the contents from a shader by name, simply get the string (const char*) by it's name. The generated name will be set to the shader file plus the \_min suffix. Example:
