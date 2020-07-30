@@ -168,18 +168,29 @@
             <TabItem Header="Embedded">
                 <Grid Margin="8">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="32"/>
                     </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0" Margin="0,2">
+                        <TextBlock Text="Filter"/>
+                        <TextBox Margin="4,0,0,0" Text="{Binding EmbeddedFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="TextChanged">
+                                    <i:InvokeCommandAction Command="{Binding EmbeddedFilterTextChangedCommand}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
+                    </DockPanel>
                     <ListBox 
-                        ItemsSource="{Binding Embedded, Mode=TwoWay}"
+                        ItemsSource="{Binding FilteredEmbedded, Mode=TwoWay}"
                         ItemTemplate="{StaticResource FileTemplate}"
-                        Grid.Row="0" 
+                        Grid.Row="1" 
                         SelectionMode="Extended" 
                         SelectionChanged="ListBoxEmbedded_SelectionChanged" 
                         AlternationCount="2"
                         HorizontalContentAlignment="Stretch"/>
-                    <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,8,0,0">
+                    <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,8,0,0">
                         <Button Width="80" Content="Add..." Command="{Binding AddEmbeddedCommand}"/>
                         <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadEmbeddedCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveEmbeddedCommand}"/>

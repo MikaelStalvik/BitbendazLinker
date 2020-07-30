@@ -5,8 +5,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -28,9 +26,11 @@ namespace BitbendazLinkerClient.ViewModels
         private const string JSON_FILTER = "JSON files|*.json";
         private const string BBDATA_FILTER = "Bitbendaz data files|*.bb";
         private const string ALLFILES_FILTER = "All files|*.*";
+        private const int TIMER_THRESHOLD = 750;
 
         private DispatcherTimer ShaderFilterTimer { get; set; }
         private DispatcherTimer TextureFilterTimer { get; set; }
+        private DispatcherTimer EmbeddedFilterTimer { get; set; }
 
         private int _shaderCount;
         public int ShaderCount
@@ -159,6 +159,16 @@ namespace BitbendazLinkerClient.ViewModels
         }
 
 
+        private void UpdateEmbeddedFilter()
+        {
+            FilteredEmbedded = _embeddedFilter != null && _embeddedFilter.Length >= 3 ? new ObservableCollection<FileHolder>(Embedded.Where(x => x.Filename.Contains(_embeddedFilter, StringComparison.CurrentCultureIgnoreCase))) : new ObservableCollection<FileHolder>(Embedded);
+        }
+        private string _embeddedFilter;
+        public string EmbeddedFilter
+        {
+            get => _embeddedFilter;
+            set => SetProperty(ref _embeddedFilter, value);
+        }
         private ObservableCollection<FileHolder> _embedded;
         public ObservableCollection<FileHolder> Embedded
         {
@@ -166,9 +176,20 @@ namespace BitbendazLinkerClient.ViewModels
             set
             {
                 SetProperty(ref _embedded, value);
-                EmbeddedCount = Embedded.Count;
+                UpdateEmbeddedFilter();
             }
         }
+        private ObservableCollection<FileHolder> _filteredEmbedded;
+        public ObservableCollection<FileHolder> FilteredEmbedded
+        {
+            get => _filteredEmbedded;
+            set
+            {
+                SetProperty(ref _filteredEmbedded, value);
+                EmbeddedCount = FilteredEmbedded.Count;
+            }
+        }
+
         private int _embeddedCount;
         public int EmbeddedCount
         {
@@ -276,6 +297,7 @@ namespace BitbendazLinkerClient.ViewModels
         public RelayCommand ImportEmbeddedCommand { get; }
         public RelayCommand ShaderFilterTextChangedCommand { get; }
         public RelayCommand TextureFilterTextChangedCommand { get; }
+        public RelayCommand EmbeddedFilterTextChangedCommand { get; }
 
         private void OpenFileDialog(string defaultExt, string filter, Action<string> completeAction)
         {
@@ -294,17 +316,23 @@ namespace BitbendazLinkerClient.ViewModels
             Textures = new ObservableCollection<FileHolder>();
             Embedded = new ObservableCollection<FileHolder>();
 
-            ShaderFilterTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(750)};
+            ShaderFilterTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(TIMER_THRESHOLD)};
             ShaderFilterTimer.Tick += (sender, args) =>
             {
                 ShaderFilterTimer.Stop();
                 UpdateShaderFilter();
             };
-            TextureFilterTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(750)};
+            TextureFilterTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(TIMER_THRESHOLD) };
             TextureFilterTimer.Tick += (sender, args) =>
             {
                 TextureFilterTimer.Stop();
                 UpdateTextureFilter();
+            };
+            EmbeddedFilterTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(TIMER_THRESHOLD) };
+            EmbeddedFilterTimer.Tick += (sender, args) =>
+            {
+                EmbeddedFilterTimer.Stop();
+                UpdateEmbeddedFilter();
             };
 
             BrowseCommand = new RelayCommand(o =>
@@ -511,6 +539,13 @@ namespace BitbendazLinkerClient.ViewModels
                 if (!TextureFilterTimer.IsEnabled)
                 {
                     TextureFilterTimer.Start();
+                }
+            }, o => true);
+            EmbeddedFilterTextChangedCommand = new RelayCommand(o =>
+            {
+                if (!EmbeddedFilterTimer.IsEnabled)
+                {
+                    EmbeddedFilterTimer.Start();
                 }
             }, o => true);
         }
