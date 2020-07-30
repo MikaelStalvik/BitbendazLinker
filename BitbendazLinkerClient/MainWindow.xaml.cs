@@ -12,6 +12,7 @@ namespace BitbendazLinkerClient
     public partial class MainWindow : Window
     {
         private readonly LinkerViewModel _viewModel = new LinkerViewModel();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -40,5 +41,6 @@ namespace BitbendazLinkerClient
             var listBox = (ListBox)sender;
             _viewModel.SelectedObjects = listBox.SelectedItems.Cast<FileHolder>().ToList();
         }
+
     }
 }

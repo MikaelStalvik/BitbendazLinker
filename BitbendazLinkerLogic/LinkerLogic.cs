@@ -102,17 +102,29 @@ namespace BitbendazLinkerLogic
             sb.AppendLine("  {");
             sb.AppendLine("    int offset;");
             sb.AppendLine("    int size;");
+            sb.AppendLine("    std::string target_path;");
             sb.AppendLine("    std::string filename;");
             sb.AppendLine("  };");
         }
 
-        private static long GenerateFileBlock(StringBuilder sb, string filename, long ofs)
+        private static long GenerateFileBlock(StringBuilder sb, string filename, long ofs, string targetPath)
         {
             var fi = new FileInfo(filename);
             sb.Append("{");
             sb.Append(ofs);
             sb.Append(",");
             sb.Append(fi.Length);
+            if (!string.IsNullOrEmpty(targetPath))
+            {
+                sb.Append(", std::string(\"");
+                sb.Append(targetPath);
+                sb.Append("\")");
+            }
+            else
+            {
+                sb.Append(", std::string(\"");
+                sb.Append("\")");
+            }
             sb.Append(", std::string(\"");
             sb.Append(Path.GetFileName(filename));
             sb.Append("\")}");
@@ -229,6 +241,23 @@ namespace BitbendazLinkerLogic
             }
         }
 
+        private static readonly string[] SizeSuffixes =
+            { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+
+        public static string SizeSuffix(long value, int decimalPlaces = 1)
+        {
+            if (value < 0) { return "-" + SizeSuffix(-value); }
+
+            var i = 0;
+            var dValue = (decimal)value;
+            while (Math.Round(dValue, decimalPlaces) >= 1000)
+            {
+                dValue /= 1024;
+                i++;
+            }
+
+            return string.Format("{0:n" + decimalPlaces + "} {1}", dValue, SizeSuffixes[i]);
+        }
         public static (bool, string) GenerateLinkedFile(
             IEnumerable<string> objects, 
             IEnumerable<string> textures, 
@@ -250,7 +279,7 @@ namespace BitbendazLinkerLogic
                 sb.AppendLine($"static FileObject objectFileObjects[{objects.Count()}] = {{");
                 foreach (var file in objects)
                 {
-                    var l = GenerateFileBlock(sb, file, ofs);
+                    var l = GenerateFileBlock(sb, file, ofs, string.Empty);
                     ofs += l;
                     if (idx < objects.Count() - 1)
                     {
@@ -265,7 +294,7 @@ namespace BitbendazLinkerLogic
             sb.AppendLine($"static FileObject textureFileObjects[{textures.Count()}] = {{");
             foreach (var file in textures)
             {
-                var l = GenerateFileBlock(sb, file, ofs);
+                var l = GenerateFileBlock(sb, file, ofs, string.Empty);
                 ofs += l;
                 if (idx < textures.Count() - 1)
                 {
@@ -275,25 +304,34 @@ namespace BitbendazLinkerLogic
             }
             sb.AppendLine("};");
 
-            idx = 0;
-            sb.AppendLine($"static FileObject embeddedFileObjects[{embedded.Count()}] = {{");
-            foreach (var file in embedded)
+            if (embedded.Any())
             {
-                var l = GenerateFileBlock(sb, file, ofs);
-                ofs += l;
-                if (idx < embedded.Count() - 1)
+                idx = 0;
+                sb.AppendLine($"static FileObject embeddedFileObjects[{embedded.Count()}] = {{");
+                foreach (var file in embedded)
                 {
-                    sb.AppendLine(",");
-                };
-                idx++;
+                    var lastPath = new DirectoryInfo(file).Parent.Name;
+                    var l = GenerateFileBlock(sb, file, ofs, lastPath);
+                    ofs += l;
+                    if (idx < embedded.Count() - 1)
+                    {
+                        sb.AppendLine(",");
+                    }
+
+                    ;
+                    idx++;
+                }
+
+                sb.AppendLine("};");
             }
-            sb.AppendLine("};");
 
             GenerateBoilerplate(sb, objects.Any(), textures.Any(), embedded.Any());
             sb.AppendLine("#endif");
             SaveHeaderFile(sb, outputHeaderFilename);
             CreateLinkedFile(outputFilename, objects, textures, embedded, useCompression);
-            return (true, "Linked file created OK!");
+
+            var fileInfo = new FileInfo(outputFilename);
+            return (true, $"Linked file created OK!\n\nSize: {SizeSuffix(fileInfo.Length)}");
         }
     }
 }
