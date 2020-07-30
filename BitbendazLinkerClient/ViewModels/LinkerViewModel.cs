@@ -298,6 +298,10 @@ namespace BitbendazLinkerClient.ViewModels
         public RelayCommand ShaderFilterTextChangedCommand { get; }
         public RelayCommand TextureFilterTextChangedCommand { get; }
         public RelayCommand EmbeddedFilterTextChangedCommand { get; }
+        public RelayCommand ShaderListboxSelectionChangedCommand { get; }
+        public RelayCommand TexturesListboxSelectionChangedCommand { get; }
+        public RelayCommand ObjectsListboxSelectionChangedCommand { get; }
+        public RelayCommand EmbeddedListboxSelectionChangedCommand { get; }
 
         private void OpenFileDialog(string defaultExt, string filter, Action<string> completeAction)
         {
@@ -474,6 +478,7 @@ namespace BitbendazLinkerClient.ViewModels
                 OpenFileDialog("*.*", ALLFILES_FILTER, s =>
                 {
                     var basePath = Path.GetDirectoryName(s);
+                    if (basePath == null) return;
                     var lines = File.ReadAllLines(s);
                     foreach (var line in lines)
                     {
@@ -493,6 +498,7 @@ namespace BitbendazLinkerClient.ViewModels
                 OpenFileDialog("*.*", ALLFILES_FILTER, s =>
                 {
                     var basePath = Path.GetDirectoryName(s);
+                    if (basePath == null) return;
                     var lines = File.ReadAllLines(s);
                     foreach (var line in lines)
                     {
@@ -512,6 +518,7 @@ namespace BitbendazLinkerClient.ViewModels
                 OpenFileDialog("*.*", ALLFILES_FILTER, s =>
                 {
                     var basePath = Path.GetDirectoryName(s);
+                    if (basePath == null) return;
                     var lines = File.ReadAllLines(s);
                     foreach (var line in lines)
                     {
@@ -547,6 +554,26 @@ namespace BitbendazLinkerClient.ViewModels
                 {
                     EmbeddedFilterTimer.Start();
                 }
+            }, o => true);
+            ShaderListboxSelectionChangedCommand = new RelayCommand(o =>
+            {
+                var items = (System.Collections.IList)o;
+                SelectedShaders = items.Cast<FileHolder>().ToList();
+            }, o => true);
+            TexturesListboxSelectionChangedCommand = new RelayCommand(o =>
+            {
+                var items = (System.Collections.IList)o;
+                SelectedTextures = items.Cast<FileHolder>().ToList();
+            }, o => true);
+            ObjectsListboxSelectionChangedCommand = new RelayCommand(o =>
+            {
+                var items = (System.Collections.IList)o;
+                SelectedObjects = items.Cast<FileHolder>().ToList();
+            }, o => true);
+            EmbeddedListboxSelectionChangedCommand = new RelayCommand(o =>
+            {
+                var items = (System.Collections.IList)o;
+                SelectedEmbedded = items.Cast<FileHolder>().ToList();
             }, o => true);
         }
 

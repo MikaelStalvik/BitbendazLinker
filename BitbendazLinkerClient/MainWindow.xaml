@@ -6,7 +6,7 @@
             xmlns:local="clr-namespace:BitbendazLinkerClient"
             xmlns:converters="clr-namespace:BitbendazLinkerClient.Converters"
             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-
+            xmlns:ViewModels="clr-namespace:BitbendazLinkerClient.ViewModels"
             mc:Ignorable="d"
             Title="Bitbendaz Linker" Height="450" Width="800" MinHeight="450" MinWidth="800">
 
@@ -31,6 +31,9 @@
             </DockPanel>
         </DataTemplate>
     </Window.Resources>
+    <Window.DataContext>
+        <ViewModels:LinkerViewModel/>
+    </Window.DataContext>
     <Grid Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -69,10 +72,6 @@
             </TabItem>
             <TabItem Header="Shaders">
                 <Grid Margin="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="178*"/>
-                        <ColumnDefinition Width="585*"/>
-                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
@@ -89,13 +88,19 @@
                         </TextBox>
                     </DockPanel>
                     <ListBox 
+                        x:Name="ShadersListbox"
                         ItemsSource="{Binding FilteredShaders, Mode=TwoWay}" 
                         ItemTemplate="{StaticResource FileTemplate}"
                         Grid.Row="1" 
                         SelectionMode="Extended" 
-                        SelectionChanged="ListBox_SelectionChanged" 
                         AlternationCount="2" 
                         HorizontalContentAlignment="Stretch" Grid.ColumnSpan="2">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding ShaderListboxSelectionChangedCommand}" CommandParameter="{Binding ElementName=ShadersListbox, Path=SelectedItems}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+
                     </ListBox>
                     <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,8,0,0" Grid.ColumnSpan="2">
                         <Button Width="80" Content="Add..." Command="{Binding AddShadersCommand}"/>
@@ -113,14 +118,20 @@
                         <RowDefinition Height="32"/>
                     </Grid.RowDefinitions>
                     <ListBox 
+                        x:Name="ObjectsListbox"
                         ItemsSource="{Binding Objects, Mode=TwoWay}" 
                         ItemTemplate="{StaticResource FileTemplate}"
                         Grid.Row="0" 
                         SelectionMode="Extended" 
-                        SelectionChanged="ListBoxObjects_SelectionChanged" 
                         AlternationCount="2"
-                        HorizontalContentAlignment="Stretch"/>
-                    <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,0,0,0">
+                        HorizontalContentAlignment="Stretch">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding ObjectsListboxSelectionChangedCommand}" CommandParameter="{Binding ElementName=ObjectsListbox, Path=SelectedItems}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListBox>
+                    <DockPanel Grid.Row="1" LastChildFill="False" Margin="0,8,0,0">
                         <Button Width="80" Content="Add..." Command="{Binding AddObjectsCommand}"/>
                         <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadObjectsCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveObjectsCommand}"/>
@@ -148,13 +159,19 @@
                     </DockPanel>
 
                     <ListBox 
+                        x:Name="TexturesListbox"
                         ItemsSource="{Binding FilteredTextures, Mode=TwoWay}"
                         ItemTemplate="{StaticResource FileTemplate}"
                         Grid.Row="1" 
                         SelectionMode="Extended" 
-                        SelectionChanged="ListBoxTextures_SelectionChanged" 
                         AlternationCount="2"
-                        HorizontalContentAlignment="Stretch"/>
+                        HorizontalContentAlignment="Stretch">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding TexturesListboxSelectionChangedCommand}" CommandParameter="{Binding ElementName=TexturesListbox, Path=SelectedItems}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListBox>
                     <TextBlock Grid.Row="2" Text="{Binding TexturesSize, Converter={StaticResource FileSizeDisplayConverter}}"/>
                     <DockPanel Grid.Row="3" LastChildFill="False" Margin="0,8,0,0">
                         <Button Width="80" Content="Add..." Command="{Binding AddTexturesCommand}"/>
@@ -183,13 +200,19 @@
                         </TextBox>
                     </DockPanel>
                     <ListBox 
+                        x:Name="EmbeddedListbox"
                         ItemsSource="{Binding FilteredEmbedded, Mode=TwoWay}"
                         ItemTemplate="{StaticResource FileTemplate}"
                         Grid.Row="1" 
                         SelectionMode="Extended" 
-                        SelectionChanged="ListBoxEmbedded_SelectionChanged" 
                         AlternationCount="2"
-                        HorizontalContentAlignment="Stretch"/>
+                        HorizontalContentAlignment="Stretch">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding EmbeddedListboxSelectionChangedCommand}" CommandParameter="{Binding ElementName=EmbeddedListbox, Path=SelectedItems}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListBox>
                     <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,8,0,0">
                         <Button Width="80" Content="Add..." Command="{Binding AddEmbeddedCommand}"/>
                         <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadEmbeddedCommand}"/>
