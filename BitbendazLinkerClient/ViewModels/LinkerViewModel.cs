@@ -332,7 +332,7 @@ namespace BitbendazLinkerClient.ViewModels
             Shaders = new ObservableCollection<FileHolder>();
             Textures = new ObservableCollection<FileHolder>();
             Embedded = new ObservableCollection<FileHolder>();
-
+            IsDark = true;
             ShaderFilterTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(TIMER_THRESHOLD)};
             ShaderFilterTimer.Tick += (sender, args) =>
             {
