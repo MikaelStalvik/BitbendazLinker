@@ -7,8 +7,12 @@
             xmlns:converters="clr-namespace:BitbendazLinkerClient.Converters"
             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
             xmlns:ViewModels="clr-namespace:BitbendazLinkerClient.ViewModels"
+            xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
             mc:Ignorable="d"
             Title="Bitbendaz Linker" Height="450" Width="800" MinHeight="450" MinWidth="800">
+    <Window.Style>
+        <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}"/>
+    </Window.Style>
 
     <Window.Resources>
         <converters:FileSizeConverter x:Key="FileSizeConverter"/>
@@ -67,7 +71,10 @@
                     <CheckBox IsChecked="{Binding GenerateShaders}" Margin="132,8,0,0" Content="Generate shaders"/>
                     <CheckBox IsChecked="{Binding GenerateLinkedFiles}" Margin="132,4,0,0" Content="Generate linked files"/>
                     <CheckBox IsChecked="{Binding UseCompression}" Margin="132,4,0,0" Content="Use compression"/>
-
+                    <ToggleButton  Margin="132,4,0,0" 
+                                   Style="{DynamicResource {x:Static adonisUi:Styles.ToggleSwitch}}"
+                                   IsChecked="{Binding IsDark}"
+                                   Content="Dark mode"/>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Shaders">

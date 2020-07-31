@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
+using AdonisUI;
 
 namespace BitbendazLinkerClient.ViewModels
 {
@@ -31,6 +32,18 @@ namespace BitbendazLinkerClient.ViewModels
         private DispatcherTimer ShaderFilterTimer { get; set; }
         private DispatcherTimer TextureFilterTimer { get; set; }
         private DispatcherTimer EmbeddedFilterTimer { get; set; }
+
+        private bool _isDark;
+        public bool IsDark
+        {
+            get => _isDark;
+            set
+            {
+                SetProperty(ref _isDark, value);
+                var colorScheme = _isDark ? ResourceLocator.DarkColorScheme : ResourceLocator.LightColorScheme;
+                ResourceLocator.SetColorScheme(Application.Current.Resources, colorScheme);
+            }
+        }
 
         private int _shaderCount;
         public int ShaderCount

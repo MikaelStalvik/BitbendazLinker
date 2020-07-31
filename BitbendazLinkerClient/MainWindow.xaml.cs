@@ -1,8 +1,5 @@
-﻿using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using BitbendazLinkerClient.Models;
-using BitbendazLinkerClient.ViewModels;
+﻿using System.Windows;
+using AdonisUI;
 
 namespace BitbendazLinkerClient
 {
