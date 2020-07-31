@@ -3,7 +3,6 @@
             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-            xmlns:local="clr-namespace:BitbendazLinkerClient"
             xmlns:converters="clr-namespace:BitbendazLinkerClient.Converters"
             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
             xmlns:ViewModels="clr-namespace:BitbendazLinkerClient.ViewModels"
@@ -18,22 +17,15 @@
         <converters:FileSizeConverter x:Key="FileSizeConverter"/>
         <converters:FileSizeDisplayConverter x:Key="FileSizeDisplayConverter"/>
         <converters:CountConverter x:Key="CountConverter"/>
-        <Style TargetType="{x:Type ListBoxItem}">
-            <Style.Triggers>
-                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                    <Setter Property="Background" Value="#ffffff"></Setter>
-                </Trigger>
-                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                    <Setter Property="Background" Value="#efefef"></Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
         <DataTemplate x:Key="FileTemplate">
             <DockPanel LastChildFill="True">
-                <TextBlock Text="{Binding Size, Converter={StaticResource FileSizeConverter}}" DockPanel.Dock="Right"/>
-                <TextBlock Text="{Binding Filename}"/>
+                <TextBlock Text="{Binding Size, Converter={StaticResource FileSizeConverter}}" DockPanel.Dock="Right" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
+                <TextBlock Text="{Binding Filename}" Foreground="{DynamicResource {x:Static adonisUi:Brushes.ForegroundBrush}}"/>
             </DockPanel>
         </DataTemplate>
+        <Style x:Key="ListboxContainerStyle" TargetType="ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
     </Window.Resources>
     <Window.DataContext>
         <ViewModels:LinkerViewModel/>
@@ -49,7 +41,7 @@
             <TextBlock Text="Project file" VerticalAlignment="Center" Margin="0,0,4,0"/>
             <TextBox Margin="4,0,0,0" Text="{Binding IndexFile}"/>
         </DockPanel>
-        <TabControl Grid.Row="1" Margin="0,8,0,8">
+        <TabControl Grid.Row="1" Margin="0,8,0,8" Background="{DynamicResource {x:Static adonisUi:Brushes.Layer1HighlightBrush}}">
             <TabItem Header="Settings">
                 <StackPanel Margin="8">
                     <DockPanel>
@@ -98,6 +90,7 @@
                         x:Name="ShadersListbox"
                         ItemsSource="{Binding FilteredShaders, Mode=TwoWay}" 
                         ItemTemplate="{StaticResource FileTemplate}"
+                        ItemContainerStyle="{StaticResource ListboxContainerStyle}"
                         Grid.Row="1" 
                         SelectionMode="Extended" 
                         AlternationCount="2" 
@@ -128,6 +121,7 @@
                         x:Name="ObjectsListbox"
                         ItemsSource="{Binding Objects, Mode=TwoWay}" 
                         ItemTemplate="{StaticResource FileTemplate}"
+                        ItemContainerStyle="{StaticResource ListboxContainerStyle}"
                         Grid.Row="0" 
                         SelectionMode="Extended" 
                         AlternationCount="2"
@@ -169,6 +163,7 @@
                         x:Name="TexturesListbox"
                         ItemsSource="{Binding FilteredTextures, Mode=TwoWay}"
                         ItemTemplate="{StaticResource FileTemplate}"
+                        ItemContainerStyle="{StaticResource ListboxContainerStyle}"
                         Grid.Row="1" 
                         SelectionMode="Extended" 
                         AlternationCount="2"
@@ -210,6 +205,7 @@
                         x:Name="EmbeddedListbox"
                         ItemsSource="{Binding FilteredEmbedded, Mode=TwoWay}"
                         ItemTemplate="{StaticResource FileTemplate}"
+                        ItemContainerStyle="{StaticResource ListboxContainerStyle}"
                         Grid.Row="1" 
                         SelectionMode="Extended" 
                         AlternationCount="2"
