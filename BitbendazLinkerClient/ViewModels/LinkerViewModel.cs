@@ -503,6 +503,7 @@ namespace BitbendazLinkerClient.ViewModels
                         }
                         RemoveShadersCommand.InvokeCanExecuteChanged();
                         ShaderCount = Shaders.Count;
+                        UpdateShaderFilter();
                     }
                 });
             }, o => true);
@@ -523,6 +524,7 @@ namespace BitbendazLinkerClient.ViewModels
                         }
                         RemoveTexturesCommand.InvokeCanExecuteChanged();
                         TextureCount = Textures.Count;
+                        UpdateTextureFilter();
                     }
                 });
             }, o => true);
@@ -544,6 +546,7 @@ namespace BitbendazLinkerClient.ViewModels
                         }
                         RemoveEmbeddedCommand.InvokeCanExecuteChanged();
                         EmbeddedCount = Embedded.Count;
+                        UpdateEmbeddedFilter();
                     }
                 });
             }, o => true);
