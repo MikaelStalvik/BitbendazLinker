@@ -615,9 +615,11 @@ namespace BitbendazLinkerClient.ViewModels
                 case ListType.Texture:
                     Textures = new ObservableCollection<FileHolder>(tmp);
                     UpdateTextureFilter();
+                    UpdateTextureFilter();
                     break;
                 case ListType.EmbeddedObjects:
                     Embedded = new ObservableCollection<FileHolder>(tmp);
+                    UpdateEmbeddedFilter();
                     break;
             }
             removeList.Clear();
@@ -637,6 +639,7 @@ namespace BitbendazLinkerClient.ViewModels
                 command.InvokeCanExecuteChanged();
                 UpdateShaderFilter();
                 UpdateTextureFilter();
+                UpdateEmbeddedFilter();
             }
         }
         private void LoadFilesAndAddToList(ObservableCollection<FileHolder> targetList, RelayCommand command)
