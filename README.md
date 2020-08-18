@@ -1,5 +1,7 @@
 # Bitbendaz Linker Tool
 
+![](https://github.com/MikaelStalvik/BitbendazLinker/blob/master/screenshot.png)
+
 Bitbendaz Linker Tool is a tool that generates C/C++ header files from one or more shader files from disk.
 The generated header file makes it easy to consume shaders in a game/demo without exposing them on disk.
 Some trimming is made when the header file is generated, comments can optionally be removed.
