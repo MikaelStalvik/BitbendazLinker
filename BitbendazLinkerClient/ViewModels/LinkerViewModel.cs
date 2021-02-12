@@ -538,6 +538,7 @@ namespace BitbendazLinkerClient.ViewModels
                     foreach (var line in lines)
                     {
                         if (string.IsNullOrEmpty(line)) continue;
+                        if (line.StartsWith("###")) continue;
                         var absolutePath = Path.GetFullPath(line, basePath);
                         if (File.Exists(absolutePath))
                         {
