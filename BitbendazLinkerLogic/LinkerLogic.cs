@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -51,6 +52,11 @@ namespace BitbendazLinkerLogic
             return sb.ToString();
         }
 
+        private static bool IsLineEmpty(string data)
+        {
+            return string.IsNullOrEmpty(data) || data.StartsWith("//");
+        }
+
         public static (bool, string) GenerateShaders(IEnumerable<string> shaderFiles, string outputFilename, bool stripComments)
         {
             if (!shaderFiles.Any()) return (false, "No shaders selected");
@@ -58,8 +64,15 @@ namespace BitbendazLinkerLogic
             sb.AppendLine(ShaderHeader());
             sb.AppendLine("map<std::string, std::string> shader_table{");
 
+            var notFound = new StringBuilder();
             foreach (var shaderFile in shaderFiles)
             {
+                if (!File.Exists(shaderFile))
+                {
+                    notFound.AppendLine(shaderFile);
+                    Console.WriteLine($"NOT FOUND: {shaderFile}");
+                    continue;
+                }
                 var sourceData = File.ReadAllLines(shaderFile);
                 var ext = Path.GetExtension(shaderFile);
                 var suffix = ext.Replace(".", "_");
@@ -72,12 +85,30 @@ namespace BitbendazLinkerLogic
                 foreach (var s in sourceData)
                 {
                     var ts = s.Trim();
-                    if (!string.IsNullOrEmpty(ts) && !ts.StartsWith("//"))
+                    //if (!string.IsNullOrEmpty(ts) && !ts.StartsWith("//"))
+                    if (!IsLineEmpty(ts))
                     {
                         if (!ts.StartsWith(@"//"))
                         {
-                            var adjusted = s.Replace("\"", "\"\"");
-                            sb.AppendLine($"\"{adjusted}{nl}\"");
+                            if (ts.StartsWith("#include"))
+                            {
+                                var includeName = ts.Replace("#include", string.Empty).Trim();
+                                var fullIncludeName = Path.Combine(Path.GetDirectoryName(shaderFile), includeName);
+                                var includeData = File.ReadAllLines(fullIncludeName);
+                                foreach (var includeLine in includeData)
+                                {
+                                    var trimmed = includeLine.Trim();
+                                    if (!IsLineEmpty(trimmed))
+                                    {
+                                        var adjustedInclude = trimmed.Replace("\"", "\"\"");
+                                        sb.AppendLine($"\"{adjustedInclude}{nl}\"");
+                                    }
+                                }
+                            } else
+                            {
+                                var adjusted = s.Replace("\"", "\"\"");
+                                sb.AppendLine($"\"{adjusted}{nl}\"");
+                            }
                         }
                     }
                 }
@@ -88,6 +119,7 @@ namespace BitbendazLinkerLogic
             sb.AppendLine("};");
             sb.AppendLine(ShaderFooter());
             File.WriteAllText(outputFilename, stripComments ? StripComments(sb.ToString()) : sb.ToString());
+
             return (true, "Shaders minified ok!");
         }
 
@@ -109,6 +141,11 @@ namespace BitbendazLinkerLogic
 
         private static long GenerateFileBlock(StringBuilder sb, string filename, long ofs, string targetPath)
         {
+            if (!File.Exists(filename))
+            {
+                Debug.WriteLine($"{filename} DOES NOT EXISTS");
+                return 0;
+            }
             var fi = new FileInfo(filename);
             sb.Append("{");
             sb.Append(ofs);
@@ -213,6 +250,7 @@ namespace BitbendazLinkerLogic
                 }
                 foreach (var file in embeded)
                 {
+                    if (!File.Exists(file)) continue;
                     using (var src = new FileStream(file, FileMode.Open))
                     {
                         var buf = new byte[src.Length];
@@ -322,6 +360,11 @@ namespace BitbendazLinkerLogic
                     idx++;
                 }
 
+                sb.AppendLine("};");
+            } 
+            else
+            {
+                sb.AppendLine($"static FileObject embeddedFileObjects[1] = {{");
                 sb.AppendLine("};");
             }
 

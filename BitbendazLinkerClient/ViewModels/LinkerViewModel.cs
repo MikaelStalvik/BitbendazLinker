@@ -305,6 +305,7 @@ namespace BitbendazLinkerClient.ViewModels
         public RelayCommand AddEmbeddedCommand { get; }
         public RelayCommand LoadEmbeddedCommand { get; }
         public RelayCommand RemoveEmbeddedCommand { get; }
+        public RelayCommand CleanEmbeddedCommand { get; }
         public RelayCommand ImportShadersCommand { get; }
         public RelayCommand ImportTexturesCommand { get; }
         public RelayCommand ImportEmbeddedCommand { get; }
