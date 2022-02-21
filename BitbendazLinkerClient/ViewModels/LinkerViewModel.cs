@@ -688,9 +688,27 @@ namespace BitbendazLinkerClient.ViewModels
             MessageBox.Show(result ? message : $"Error: {message}");
         }
 
+        private List<FileHolder> CollectionToList(ObservableCollection<FileHolder> list)
+        {
+            var result = new List<FileHolder>();
+            foreach(var item in list)
+            {
+                if (File.Exists(item.Filename))
+                {
+                    result.Add(item);
+                }
+            }
+            return result;
+        }
         private void GenerateDataFile(object o)
         {
-            var (result, message) = LinkerLogic.GenerateLinkedFile(Objects.ToList(), Textures.ToList(), Embedded.ToList(), _linkedOutputFile, _linkedOutputHeaderFile, _useCompression);
+            var (result, message) = LinkerLogic.GenerateLinkedFile(
+                Objects.ToListCheckFiles(), 
+                Textures.ToListCheckFiles(), 
+                Embedded.ToListCheckFiles(), 
+                _linkedOutputFile, 
+                _linkedOutputHeaderFile, 
+                _useCompression);
             MessageBox.Show(result ? message : $"Error: {message}");
         }
     }
