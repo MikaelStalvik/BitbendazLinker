@@ -221,6 +221,7 @@
                         <Button Width="80" Content="Add..." Command="{Binding AddEmbeddedCommand}"/>
                         <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadEmbeddedCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveEmbeddedCommand}"/>
+                        <Button Width="80" Content="Kill" Margin="8,0,0,0" Command="{Binding KillEmbeddedCommand}"/>
                         <Button Width="80" DockPanel.Dock="Right" Content="Import" Margin="8,0,0,0" Command="{Binding ImportEmbeddedCommand}"/>
                         <TextBlock DockPanel.Dock="Right" Text="{Binding EmbeddedCount, Converter={StaticResource CountConverter}}"/>
                     </DockPanel>

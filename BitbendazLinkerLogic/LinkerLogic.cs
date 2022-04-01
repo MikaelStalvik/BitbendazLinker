@@ -318,11 +318,14 @@ namespace BitbendazLinkerLogic
                 foreach (var file in objects)
                 {
                     var l = GenerateFileBlock(sb, file, ofs, string.Empty);
-                    ofs += l;
-                    if (idx < objects.Count() - 1)
+                    if (l > 0)
                     {
-                        sb.AppendLine(",");
-                    };
+                        ofs += l;
+                        if (idx < objects.Count() - 1)
+                        {
+                            sb.AppendLine(",");
+                        };
+                    }
                     idx++;
                 }
                 sb.AppendLine("};");
@@ -333,6 +336,7 @@ namespace BitbendazLinkerLogic
             foreach (var file in textures)
             {
                 var l = GenerateFileBlock(sb, file, ofs, string.Empty);
+                Console.WriteLine(sb.ToString());
                 ofs += l;
                 if (idx < textures.Count() - 1)
                 {
