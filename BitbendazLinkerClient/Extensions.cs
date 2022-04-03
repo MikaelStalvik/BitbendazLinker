@@ -32,5 +32,19 @@ namespace BitbendazLinkerClient
             }
             return result;
         }
+
+        public static IEnumerable<string> ToListCheckFiles(this ObservableCollection<FileHolder> list)
+        {
+            var result = new List<string>();
+            foreach (var item in list)
+            {
+                if (File.Exists(item.Filename))
+                {
+                    result.Add(item.Filename);
+                }
+            }
+            return result;
+        }
+
     }
 }
