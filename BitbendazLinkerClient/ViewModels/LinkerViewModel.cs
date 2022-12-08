@@ -306,6 +306,7 @@ namespace BitbendazLinkerClient.ViewModels
         public RelayCommand AddEmbeddedCommand { get; }
         public RelayCommand LoadEmbeddedCommand { get; }
         public RelayCommand RemoveEmbeddedCommand { get; }
+        public RelayCommand KillEmbeddedCommand { get; }
         public RelayCommand CleanEmbeddedCommand { get; }
         public RelayCommand ImportShadersCommand { get; }
         public RelayCommand ImportTexturesCommand { get; }
@@ -455,6 +456,16 @@ namespace BitbendazLinkerClient.ViewModels
                 RemoveSelectedItemsFromList(Embedded, SelectedEmbedded, RemoveEmbeddedCommand, ListType.EmbeddedObjects);
                 EmbeddedCount = Embedded.Count;
             }, o => SelectedEmbedded?.Count > 0);
+            KillEmbeddedCommand = new RelayCommand(o =>
+            {
+                foreach(var item in Embedded)
+                {
+                    if (!File.Exists(item.Filename))
+                    {
+                        Console.WriteLine($"KILL {item.Filename}");
+                    }
+                }
+            }, o => true);
 
             CloseCommand = new RelayCommand(o =>
             {
