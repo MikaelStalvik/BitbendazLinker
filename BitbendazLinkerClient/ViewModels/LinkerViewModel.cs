@@ -10,6 +10,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
 using AdonisUI;
+using System.Diagnostics;
 
 namespace BitbendazLinkerClient.ViewModels
 {
@@ -500,7 +501,17 @@ namespace BitbendazLinkerClient.ViewModels
                         if (File.Exists(absolutePath))
                         {
                             if (Shaders.FirstOrDefault(x => x.Filename == absolutePath) == null)
+                            {
                                 Shaders.Add(new FileHolder { Filename = absolutePath, Size = Extensions.GetFileSize(absolutePath) });
+                            }
+                            else
+                            {
+                                Debug.WriteLine($"Shader {absolutePath} already exists");
+                            }
+                        }
+                        else
+                        {
+                            Debug.WriteLine($"Cannot fina {absolutePath}");
                         }
                         RemoveShadersCommand.InvokeCanExecuteChanged();
                         ShaderCount = Shaders.Count;

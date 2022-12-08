@@ -78,8 +78,8 @@
                         <RowDefinition Height="32"/>
                     </Grid.RowDefinitions>
                     <DockPanel Grid.Row="0" Margin="0,2,0,2" Grid.ColumnSpan="2">
-                        <TextBlock Text="Filter"/>
-                        <TextBox Margin="4,0,0,0" Text="{Binding ShaderFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBlock Text="Filter" VerticalAlignment="Center"/>
+                        <TextBox Margin="8,0,0,0" Text="{Binding ShaderFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="TextChanged">
                                     <i:InvokeCommandAction Command="{Binding ShaderFilterTextChangedCommand}"/>
@@ -108,7 +108,7 @@
                         <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadShadersCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveShadersCommand}"/>
                         <Button Width="80" DockPanel.Dock="Right" Content="Import" Margin="8,0,0,0" Command="{Binding ImportShadersCommand}"/>
-                        <TextBlock DockPanel.Dock="Right" Text="{Binding ShaderCount, Converter={StaticResource CountConverter}}"/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding ShaderCount, Converter={StaticResource CountConverter}}" VerticalAlignment="Center"/>
                     </DockPanel>
                 </Grid>
             </TabItem>
@@ -137,7 +137,7 @@
                         <Button Width="80" Content="Add..." Command="{Binding AddObjectsCommand}"/>
                         <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadObjectsCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveObjectsCommand}"/>
-                        <TextBlock DockPanel.Dock="Right" Text="{Binding ObjectCount, Converter={StaticResource CountConverter}}"/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding ObjectCount, Converter={StaticResource CountConverter}}" VerticalAlignment="Center"/>
                     </DockPanel>
                 </Grid>
             </TabItem>
@@ -150,7 +150,7 @@
                         <RowDefinition Height="32"/>
                     </Grid.RowDefinitions>
                     <DockPanel Grid.Row="0" Margin="0,2">
-                        <TextBlock Text="Filter"/>
+                        <TextBlock Text="Filter" VerticalAlignment="Center"/>
                         <TextBox Margin="4,0,0,0" Text="{Binding TextureFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="TextChanged">
@@ -181,7 +181,7 @@
                         <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadObjectsCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveTexturesCommand}"/>
                         <Button Width="80" DockPanel.Dock="Right" Content="Import" Margin="8,0,0,0" Command="{Binding ImportTexturesCommand}"/>
-                        <TextBlock DockPanel.Dock="Right" Text="{Binding TextureCount, Converter={StaticResource CountConverter}}"/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding TextureCount, Converter={StaticResource CountConverter}}" VerticalAlignment="Center"/>
                     </DockPanel>
                 </Grid>
             </TabItem>
@@ -193,7 +193,7 @@
                         <RowDefinition Height="32"/>
                     </Grid.RowDefinitions>
                     <DockPanel Grid.Row="0" Margin="0,2">
-                        <TextBlock Text="Filter"/>
+                        <TextBlock Text="Filter" VerticalAlignment="Center"/>
                         <TextBox Margin="4,0,0,0" Text="{Binding EmbeddedFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="TextChanged">
@@ -222,7 +222,7 @@
                         <Button Width="80" Content="Load" Margin="8,0,0,0" Command="{Binding LoadEmbeddedCommand}"/>
                         <Button Width="80" Content="Remove" Margin="8,0,0,0" Command="{Binding RemoveEmbeddedCommand}"/>
                         <Button Width="80" DockPanel.Dock="Right" Content="Import" Margin="8,0,0,0" Command="{Binding ImportEmbeddedCommand}"/>
-                        <TextBlock DockPanel.Dock="Right" Text="{Binding EmbeddedCount, Converter={StaticResource CountConverter}}"/>
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding EmbeddedCount, Converter={StaticResource CountConverter}}" VerticalAlignment="Center"/>
                     </DockPanel>
                 </Grid>
             </TabItem>
