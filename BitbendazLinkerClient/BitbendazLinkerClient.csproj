@@ -15,11 +15,7 @@
   <ItemGroup>
     <PackageReference Include="AdonisUI" Version="1.16.0" />
     <PackageReference Include="AdonisUI.ClassicTheme" Version="1.16.0" />
-<<<<<<< HEAD
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-=======
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
->>>>>>> 2e952be5cc656f629bf7026e5117660d70adf9ec
     <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
   </ItemGroup>
 
