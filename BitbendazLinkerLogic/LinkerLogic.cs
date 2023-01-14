@@ -308,6 +308,8 @@ namespace BitbendazLinkerLogic
                 return (false, "Output filename not defined");
             if (string.IsNullOrWhiteSpace(outputHeaderFilename))
                 return (false, "Output header filename not defined");
+
+            var outputPath = Path.GetDirectoryName(outputFilename);
             var sb = new StringBuilder();
             AddHeader(sb);
             long ofs = 0;
@@ -335,7 +337,13 @@ namespace BitbendazLinkerLogic
             sb.AppendLine($"static FileObject textureFileObjects[{textures.Count()}] = {{");
             foreach (var file in textures)
             {
-                var l = GenerateFileBlock(sb, file, ofs, string.Empty);
+                var lastPath = new DirectoryInfo(file).Parent.Name;
+                var pathOnly = Path.GetDirectoryName(file);
+                var trimmedPath = pathOnly.Replace(outputPath, string.Empty, StringComparison.CurrentCultureIgnoreCase);
+                if (trimmedPath.StartsWith("\\")) trimmedPath = trimmedPath.Substring(1);
+                lastPath = trimmedPath.Replace("\\", "\\\\");
+
+                var l = GenerateFileBlock(sb, file, ofs, lastPath /*string.Empty*/);
                 Console.WriteLine(sb.ToString());
                 ofs += l;
                 if (idx < textures.Count() - 1)
@@ -353,6 +361,11 @@ namespace BitbendazLinkerLogic
                 foreach (var file in embedded)
                 {
                     var lastPath = new DirectoryInfo(file).Parent.Name;
+                    var pathOnly = Path.GetDirectoryName(file);
+                    var trimmedPath = pathOnly.Replace(outputPath, string.Empty, StringComparison.CurrentCultureIgnoreCase);
+                    if (trimmedPath.StartsWith("\\")) trimmedPath = trimmedPath.Substring(1);
+                    lastPath = trimmedPath.Replace("\\", "\\\\");
+
                     var l = GenerateFileBlock(sb, file, ofs, lastPath);
                     ofs += l;
                     if (idx < embedded.Count() - 1)

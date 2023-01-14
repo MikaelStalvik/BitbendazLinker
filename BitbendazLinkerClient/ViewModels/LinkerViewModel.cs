@@ -522,7 +522,7 @@ namespace BitbendazLinkerClient.ViewModels
                         }
                         else
                         {
-                            Debug.WriteLine($"Cannot fina {absolutePath}");
+                            Debug.WriteLine($"Cannot find {absolutePath}");
                         }
                         RemoveShadersCommand.InvokeCanExecuteChanged();
                         ShaderCount = Shaders.Count;
